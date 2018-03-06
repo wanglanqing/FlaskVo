@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+</head>
+<body>
+<form action="{{url_for('show_act_results')}}" method="POST">
+    <h1>请求区域</h1>
+    <table border="2">
+        <td>
+            <input type="text" name="adzoneIds" placeholder="请输入广告位id，如371,372">
+            <input type="submit" value="提交">
+        </td>
+    </table>
+</form>
+<div id="catalog" align="30%" >
+    <p></p>
+    <p></p>
+</div>
+<div id="results" align="70%">
+    <h1>结果区域</h1>
+    <p>{{ res|safe }}</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>新建模板和活动</title>
+</head>
+<body>
+    <form action="{{ url_for('create_act')}}" method="post">
+        <div>
+            <h1>请求区域</h1>
+            <table border="2">
+                <tbody>
+                    <tr><td>模板地址：</td><td><input name='template_adr' type="text" style="width:420px;" placeholder="https://display.adhudong.com/new/lottery_machine.html"></td></tr>
+                    <tr><td>样式地址：</td><td><input name="css_adr" type="text" style="width: 420px" value="https://display.adhudong.com/activity/favicon.ico"></td></tr>
+                    <tr><td>模板类型名称：</td><td><input name="template_type_name" type="text" style="width: 420px" value="" ></td></tr>
+                    <tr><td>模板名称：</td><td><input name="temlate_name" type="text" style="width: 420px" placeholder=""></td></tr>
+                    <tr><td>活动名称：</td><td><input name="act_name" type="text" style="width:420px" placeholder=""></td></tr>
+                    <tr><td>奖品个数：</td><td><select name="award_num"><option>6</option><option>8</option></select></td></tr>
+                </tbody>
+            </table>
+            <input type="submit" value="提交">
+        </div>
+    </form>
+
+    <div id="result_area">
+        <h1>结果展示区</h1>
+            <li>模板类型创建结果：</li>
+            <p>{{ template_adr | safe }}</p>
+            <li>模板创建结果：</li>
+            <p>{{ template_adr | safe }}</p>
+            <li>活动创建结果：</li>
+            <p>{{ template_adr | safe }}</p>
+            <li>奖品创建结果：</li>
+            <p>{{ template_adr | safe }}</p>
+    </div>
+
+</body>
+</html>
