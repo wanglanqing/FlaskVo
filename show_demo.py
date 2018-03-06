@@ -37,15 +37,15 @@ def create_act():
         # __init__(self, templateTypeName, act_name, award_num):
         ct = Create_template_act(template_type_name, act_name,award_num)
         # # 创建模板类型，create_template_type(self, classifi, locationAdress, preview="https://img0.adhudong.com/template/201802/24/999337a35a1a9169450685cc66560a05.png",prizesNum=6)
-        sdd = ct.create_template_type(template_adr)
+        template_type_re = ct.create_template_type(template_adr)
         # # 创建模板 ct.create_template(templateName, templateStyleUrl)
-        # ct.create_template(temlate_name, css_adr)
+        temlate_name_re = ct.create_template(temlate_name, css_adr)
         # # 创建活动，create_act(self, act_name,free_num=20, award_num=6)
-        # ct.create_act()
+        # act_re = ct.create_act()
         # # 创建活动关联的奖品，
-        # ct.create_awards()
-        # # ct.get_templateId()
-        return render_template("create_act.html",template_adr=sdd)
+        # awards_re = ct.create_awards()
+        return render_template("create_act.html", template_type_re=template_type_re, temlate_name_re=temlate_name_re)
+        # return render_template("create_act.html",template_type_re=template_type_re, temlate_name_re=temlate_name_re ,act_re=act_re,awards_re=awards_re )
     pass
 
 

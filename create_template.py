@@ -80,14 +80,13 @@ class Create_template_act(object):
         }
         post_url = "http://api.admin.adhudong.com/template/typeInsert.htm"
         re = self.s.post(post_url, data=json_body)
-        print((json.dumps(re.text))[10:14])
         print(re.json()['code'])
         if re.json()['code'] == 200:
             return ('create_template_type, 成功了')
         else:
             try:
                 raise myException("create_template_type, 失败了")
-            except myException as e:
+            except Exception as e:
                 return e.message
 
     def create_template(self,templateName, templateStyleUrl, positionId=1):
@@ -107,10 +106,13 @@ class Create_template_act(object):
         }
         re = self.s.post(post_url, data=json_body)
         print(re.text)
-        if re.status_code == 200:
+        if re.json()['code'] == 200:
             return ('create_template, 成功了')
         else:
-            return ('create_template, 失败了')
+            try:
+                raise myException('create_template, 失败了')
+            except Exception as e:
+                return e.message
 
     def create_act(self,free_num=20):
         '''
@@ -118,6 +120,9 @@ class Create_template_act(object):
         '''
         #创建活动sql, act_name,award_num,free_num,template_id
         templateId=self.get_templateId()
+        # if templateId:
+        #
+        print(templateId)
         act_sql="""
         INSERT INTO voyager.base_act_info (act_type,act_name,banner_image_url,cover_image_url,award_num,free_num,begin_time,end_time,act_rule_info,`STATUS`,update_time,create_time,template_id,expand1,expand2,expand3,expand4,expand5,expand6,expand7,expand8,expand9,change_times
         )VALUES(1,{0},'https://img4.adhudong.com/award/201802/22/089c376e9519c85ab8ce5fced7c9ea49.jpg',
@@ -129,6 +134,13 @@ class Create_template_act(object):
         try:
             self.db.execute_sql(act_sql)
             self.db.mycommit()
+            if self.get_actId():
+                return ('create_act,成功了')
+            else:
+                try:
+                    raise myException('create_act, 失败了')
+                except Exception as e:
+                    return e.message
         except:
             self.db.myrollback()
 
