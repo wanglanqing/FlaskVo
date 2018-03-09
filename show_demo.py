@@ -1,8 +1,9 @@
 # coding:utf8
 from flask import Flask,jsonify,request,render_template,url_for
-import requests
 from get_act import *
 from create_template import *
+from myException import *
+
 
 app = Flask(__name__)
 
@@ -34,20 +35,36 @@ def create_act():
         temlate_name=request.form.get('temlate_name')
         act_name=request.form.get('act_name')
         award_num =request.form.get('award_num')
-        # __init__(self, templateTypeName, act_name, award_num):
-        ct = Create_template_act(template_type_name, act_name,award_num)
-        # # 创建模板类型，create_template_type(self, classifi, locationAdress, preview="https://img0.adhudong.com/template/201802/24/999337a35a1a9169450685cc66560a05.png",prizesNum=6)
-        template_type_re = ct.create_template_type(template_adr)
-        # # 创建模板 ct.create_template(templateName, templateStyleUrl)
-        temlate_name_re = ct.create_template(temlate_name, css_adr)
-        # # 创建活动，create_act(self, act_name,free_num=20, award_num=6)
-        # act_re = ct.create_act()
-        # # 创建活动关联的奖品，
-        # awards_re = ct.create_awards()
-        return render_template("create_act.html", template_type_re=template_type_re, temlate_name_re=temlate_name_re)
-        # return render_template("create_act.html",template_type_re=template_type_re, temlate_name_re=temlate_name_re ,act_re=act_re,awards_re=awards_re )
-    pass
+        try:
+            ct = TemplateActCreation(template_type_name, act_name,award_num)
+            # 创建模板类型，create_template_type(self, classifi, locationAdress, preview="https://img0.adhudong.com/template/201802/24/999337a35a1a9169450685cc66560a05.png",prizesNum=6)
+            template_type_re = ct.create_template_type(template_adr)
+            if template_type_re.json()['code'] == 200:
+                template_type_fe = '创建模板类型' + template_type_re.text + '成功了'
+            else:
+                raise myException(sys._getframe().f_code.co_name, template_type_re.text)
 
+            # 创建模板 ct.create_template(templateName, templateStyleUrl)
+            temlate_name_re = ct.create_template(temlate_name, css_adr)
+            if temlate_name_re.json()['code'] != 200:
+                raise myException(temlate_name_re.text)
+
+            # # 创建活动，create_act(self, act_name,free_num=20, award_num=6)
+            act_re = ct.create_act()
+            print(act_re)
+            if act_re.json()['code'] != 200:
+                raise myException(act_re.text)
+            else:
+                act_re = '活动，创建成功'
+
+            # # 创建活动关联的奖品，
+            awards_re = ct.create_awards()
+            print(awards_re)
+            # return render_template("create_act.html",  act_re=template_type_fe, awards_re =awards_re )
+            return render_template("create_act.html", template_type_re=template_type_re, temlate_name_re=temlate_name_re , act_re=act_re, awards_re =awards_re )
+        except Exception as e:
+            f_re = ''
+            return render_template("create_act.html", f_re = e.message)
 
 if __name__ == '__main__':
     app.run( host="0.0.0.0", port=9000, debug=True)

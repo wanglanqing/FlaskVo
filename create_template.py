@@ -3,12 +3,13 @@
 # @Author  : wanglanqing
 
 import requests
-import json
+import sys
+import time
 from utils.db_info import *
-from myException import *
 
-class Create_template_act(object):
-    def __init__(self,templateTypeName, act_name, award_num):
+
+class TemplateActCreation(object):
+    def __init__(self, templateTypeName, act_name, award_num):
         '''
         :param templateTypeName:模板类型名称
         :param act_name: 活动名称
@@ -26,41 +27,47 @@ class Create_template_act(object):
         '''
         :return:返回act_id
         '''
-        sql = "select id from voyager.base_act_info where act_name='" + self.act_name + "'"
-        print(sql)
-        re = self.db.execute_sql(sql)
-        if len(re)!= 1:
+        sql_act = "select id from voyager.base_act_info where act_name='" + self.act_name + "'"
+        print(sql_act)
+        re_act = self.db.execute_sql(sql_act)
+        if len(re_act)!= 1:
             print('get_actId,有问题')
         else:
-            act_id = int(re[0][0])
+            act_id = int(re_act[0][0])
             return act_id
+    def get_awards_count(self):
+        sql_ac= " select count(*) from voyager.act_award where act_id=" + str(self.get_actId())
+        re_ac = self.db.execute_sql(sql_ac)
+        return re_ac[0][0]
 
     def get_templateTypeId(self):
         '''
         通过全局参数templateTypeName，获得templateTypeId
         :return:返回templateTypeId
         '''
-        sql = "select id from voyager.template_type where name='" + self.templateTypeName + "'"
-        print(sql)
-        re = self.db.execute_sql(sql)
-        if len(re) != 1:
-            print('get_templateTypeId名称有问题')
+        sql_ttpye = "select id from voyager.template_type where name='" + self.templateTypeName + "'"
+        print(sql_ttpye)
+        re_ttpye = self.db.execute_sql(sql_ttpye)
+        if len(re_ttpye) != 1:
+            print('get_templateTypeId , 名称有问题')
         else:
-            templateTypeId = int(re[0][0])
+            templateTypeId = int(re_ttpye[0][0])
             return templateTypeId
 
     def get_templateId(self):
         '''
         :return:返回templateId
         '''
-        sql = "select id from voyager.base_template_info where template_type_id='" + str(
-            self.get_templateTypeId()) + "'"
-        print(sql)
-        re = self.db.execute_sql(sql)
-        if len(re) != 1:
-            print('get_templateId有问题')
+        templateTypeId=str(self.get_templateTypeId())
+        sql_ttid = "select id from voyager.base_template_info where template_type_id=" + templateTypeId
+        print(sql_ttid)
+        re_ttid = self.db.execute_sql(sql_ttid)
+        print('&&&***^')
+        print(re_ttid)
+        if len(re_ttid) != 1:
+            print('get_templateId, 有问题')
         else:
-            templateId = int(re[0][0])
+            templateId = int(re_ttid[0][0])
             return templateId
 
     def create_template_type(self, locationAdress, preview="https://img0.adhudong.com/template/201802/24/999337a35a1a9169450685cc66560a05.png",classifi=1):
@@ -80,14 +87,18 @@ class Create_template_act(object):
         }
         post_url = "http://api.admin.adhudong.com/template/typeInsert.htm"
         re = self.s.post(post_url, data=json_body)
-        print(re.json()['code'])
-        if re.json()['code'] == 200:
-            return ('create_template_type, 成功了')
-        else:
-            try:
-                raise myException("create_template_type, 失败了")
-            except Exception as e:
-                return e.message
+        print(sys.argv[0], re)
+        return re
+        # print(re.json()['code'])
+        # if re.json()['code'] == 200:
+        #     return ('200')
+        # else:
+        #     # try:
+        #     # return myException('create_template_type, 失败了')
+        #     return ('300')
+        #     # except Exception as e:
+        #     #     return e
+
 
     def create_template(self,templateName, templateStyleUrl, positionId=1):
         '''
@@ -105,44 +116,60 @@ class Create_template_act(object):
             "templateStyleImage" : "https://img3.adhudong.com/template/201802/25/2c6f4700db7982447348db4d0960e3ad.png"
         }
         re = self.s.post(post_url, data=json_body)
-        print(re.text)
-        if re.json()['code'] == 200:
-            return ('create_template, 成功了')
-        else:
-            try:
-                raise myException('create_template, 失败了')
-            except Exception as e:
-                return e.message
+        print(sys.argv[0], re)
+        return re
+        # if re.json()['code'] == 200:
+        #     return ('create_template, 成功了')
+        # else:
+        #     try:
+        #         # raise myException('create_template, 失败了')
+        #         raise SystemExit
+        #     except Exception as e:
+        #         return e.message
 
-    def create_act(self,free_num=20):
+    def create_act(self, free_num=20):
         '''
 
         '''
         #创建活动sql, act_name,award_num,free_num,template_id
-        templateId=self.get_templateId()
-        # if templateId:
-        #
-        print(templateId)
-        act_sql="""
-        INSERT INTO voyager.base_act_info (act_type,act_name,banner_image_url,cover_image_url,award_num,free_num,begin_time,end_time,act_rule_info,`STATUS`,update_time,create_time,template_id,expand1,expand2,expand3,expand4,expand5,expand6,expand7,expand8,expand9,change_times
-        )VALUES(1,{0},'https://img4.adhudong.com/award/201802/22/089c376e9519c85ab8ce5fced7c9ea49.jpg',
-                NULL,{1},{2},NULL,NULL,
-                '<p>参与活动即有机会获得大奖。活动为概率中奖，奖品数量有限，祝君好运。</p><p>惊喜一：1000元现金</p><p>惊喜二：500元现金</p><p>惊喜三：200元现金</p><p>惊喜四：100元现金</p><p>惊喜五：50元现金</p><p>惊喜六：幸运奖</p><p>重要声明：</p><p>1、实物类奖品将在活动结束后5-10个工作日内安排发货，请耐心等待</p><p>2、卡券类奖品使用规则详见卡券介绍页</p><p>3、通过非法途径获得奖品的，主办方有权不提供奖品1</p>',
-                1,now(),now(),{3},1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-            );""".format("'"+self.act_name+"'", self.award_num, free_num, templateId)
-        print(act_sql)
-        try:
-            self.db.execute_sql(act_sql)
-            self.db.mycommit()
-            if self.get_actId():
-                return ('create_act,成功了')
-            else:
-                try:
-                    raise myException('create_act, 失败了')
-                except Exception as e:
-                    return e.message
-        except:
-            self.db.myrollback()
+        template_id=self.get_templateId()
+        print('=================================' + str(template_id))
+        time.sleep(10)
+        post_url = "http://api.admin.adhudong.com/act/modefy.htm"
+        json_body = {
+            "freeNum": 8,
+            "status": 1,
+            "awardNum": 3,
+            "expand1": 1,
+            "changeTimes": 2,
+            "bannerImageUrl": "https: //img3.adhudong.com/award/201802/25/9867c921ca0178820b8a37c677876223.jpg",
+            "actRuleInfo": "<p>参与活动即有机会获得大奖。活动为概率中奖，奖品数量有限，祝君好运。</p><p>惊喜一：1000元现金</p><p>惊喜二：500元现金</p><p>惊喜三：200元现金</p><p>惊喜四：100元现金</p><p>惊喜五：50元现金</p><p>惊喜六：幸运奖</p><p>重要声明：</p><p>1、实物类奖品将在活动结束后5-10个工作日内安排发货，请耐心等待</p><p>2、卡券类奖品使用规则详见卡券介绍页</p><p>3、通过非法途径获得奖品的，主办方有权不提供奖品</p>"
+        }
+        json_body['actName'] = self.act_name
+        json_body['templateId'] = template_id
+        re = self.s.post(post_url, data =json_body)
+        print(sys.argv[0], re)
+        return re
+        # act_sql="""
+        # INSERT INTO voyager.base_act_info (act_type,act_name,banner_image_url,cover_image_url,award_num,free_num,begin_time,end_time,act_rule_info,`STATUS`,update_time,create_time,template_id,expand1,expand2,expand3,expand4,expand5,expand6,expand7,expand8,expand9,change_times
+        # )VALUES(1,{0},'https://img4.adhudong.com/award/201802/22/089c376e9519c85ab8ce5fced7c9ea49.jpg',
+        #         NULL,{1},{2},NULL,NULL,
+        #         '<p>参与活动即有机会获得大奖。活动为概率中奖，奖品数量有限，祝君好运。</p><p>惊喜一：1000元现金</p><p>惊喜二：500元现金</p><p>惊喜三：200元现金</p><p>惊喜四：100元现金</p><p>惊喜五：50元现金</p><p>惊喜六：幸运奖</p><p>重要声明：</p><p>1、实物类奖品将在活动结束后5-10个工作日内安排发货，请耐心等待</p><p>2、卡券类奖品使用规则详见卡券介绍页</p><p>3、通过非法途径获得奖品的，主办方有权不提供奖品1</p>',
+        #         1,now(),now(),{3},1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+        #     );""".format("'"+self.act_name+"'", self.award_num, free_num, templateId)
+        # print(act_sql)
+        # try:
+        #     self.db.execute_sql(act_sql)
+        #     self.db.mycommit()
+        #     if self.get_actId():
+        #         return ('create_act,成功了')
+        #     else:
+        #         try:
+        #             raise myException('create_act, 失败了')
+        #         except Exception as e:
+        #             return e.message
+        # except:
+        #     self.db.myrollback()
 
 
     def create_awards(self):
@@ -173,22 +200,9 @@ class Create_template_act(object):
         else:
             award_list = award_8_list
         for award in award_list:
-            award_sql = '''INSERT INTO act_award (
-                act_id,
-                award_id,
-                award_rate,
-                priority,
-                update_time,
-                create_time,
-                show_copy,
-                award_icon,
-                act_award_type,
-                begin_time,
-                end_time,
-                award_num,
-                award_details,
-                award_get_instructions
-            )
+            award_sql = '''INSERT INTO act_award (act_id,award_id,award_rate,
+                priority,update_time,create_time,show_copy,award_icon,act_award_type,begin_time,end_time,award_num,
+                award_details,award_get_instructions)
             VALUES (''' + act_id + award
             print(award_sql)
             try:
@@ -196,6 +210,10 @@ class Create_template_act(object):
                 self.db.mycommit()
             except:
                 self.db.myrollback()
+        if self.get_awards_count() == self.award_num:
+            return '奖品添加成功'
+        else:
+            return '奖品添加失败'
 
     def __del__(self):
         self.db.close_cursor()
@@ -204,7 +222,7 @@ class Create_template_act(object):
 if __name__=='__main__':
     #为模板类型名称
     #__init__(self, templateTypeName, act_name, award_num):
-    ct = Create_template_act('淘粉吧转盘0301',"淘粉吧转盘0301",6)
+    ct = TemplateActCreation('淘粉吧转盘0301',"淘粉吧转盘0301",6)
     #创建模板类型，create_template_type(self, classifi, locationAdress, preview="https://img0.adhudong.com/template/201802/24/999337a35a1a9169450685cc66560a05.png",prizesNum=6)
     ct.create_template_type('https://display.adhudong.com/new/rotary_table_pink.html')
     #创建模板 ct.create_template(templateName, templateStyleUrl)
