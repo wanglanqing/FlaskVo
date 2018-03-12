@@ -38,7 +38,7 @@ class TemplateActCreation(object):
     def get_awards_count(self):
         sql_ac= " select count(*) from voyager.act_award where act_id=" + str(self.get_actId())
         re_ac = self.db.execute_sql(sql_ac)
-        return re_ac[0][0]
+        return int(re_ac[0][0])
 
     def get_templateTypeId(self):
         '''
@@ -127,7 +127,7 @@ class TemplateActCreation(object):
         #     except Exception as e:
         #         return e.message
 
-    def create_act(self, free_num=20):
+    def create_act(self, free_num):
         '''
 
         '''
@@ -137,18 +137,17 @@ class TemplateActCreation(object):
         time.sleep(10)
         post_url = "http://api.admin.adhudong.com/act/modefy.htm"
         json_body = {
-            "freeNum": 8,
             "status": 1,
             "awardNum": 3,
             "expand1": 1,
             "changeTimes": 2,
-            "bannerImageUrl": "https: //img3.adhudong.com/award/201802/25/9867c921ca0178820b8a37c677876223.jpg",
+            "bannerImageUrl": "https://img3.adhudong.com/award/201802/25/9867c921ca0178820b8a37c677876223.jpg",
             "actRuleInfo": "<p>参与活动即有机会获得大奖。活动为概率中奖，奖品数量有限，祝君好运。</p><p>惊喜一：1000元现金</p><p>惊喜二：500元现金</p><p>惊喜三：200元现金</p><p>惊喜四：100元现金</p><p>惊喜五：50元现金</p><p>惊喜六：幸运奖</p><p>重要声明：</p><p>1、实物类奖品将在活动结束后5-10个工作日内安排发货，请耐心等待</p><p>2、卡券类奖品使用规则详见卡券介绍页</p><p>3、通过非法途径获得奖品的，主办方有权不提供奖品</p>"
         }
         json_body['actName'] = self.act_name
         json_body['templateId'] = template_id
+        json_body['freeNum'] = free_num
         re = self.s.post(post_url, data =json_body)
-        print(sys.argv[0], re)
         return re
         # act_sql="""
         # INSERT INTO voyager.base_act_info (act_type,act_name,banner_image_url,cover_image_url,award_num,free_num,begin_time,end_time,act_rule_info,`STATUS`,update_time,create_time,template_id,expand1,expand2,expand3,expand4,expand5,expand6,expand7,expand8,expand9,change_times
@@ -204,14 +203,14 @@ class TemplateActCreation(object):
                 priority,update_time,create_time,show_copy,award_icon,act_award_type,begin_time,end_time,award_num,
                 award_details,award_get_instructions)
             VALUES (''' + act_id + award
-            print(award_sql)
+            # print(award_sql)
             try:
                 self.db.execute_sql(award_sql)
                 self.db.mycommit()
             except:
                 self.db.myrollback()
         if self.get_awards_count() == self.award_num:
-            return '奖品添加成功'
+            return '奖品添加成功,奖品个数为' +  str(self.award_num)
         else:
             return '奖品添加失败'
 

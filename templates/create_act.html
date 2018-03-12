@@ -16,6 +16,7 @@
                     <tr><td>模板名称：</td><td><input name="temlate_name" type="text" style="width: 420px" placeholder=""></td></tr>
                     <tr><td>活动名称：</td><td><input name="act_name" type="text" style="width:420px" placeholder=""></td></tr>
                     <tr><td>奖品个数：</td><td><select name="award_num"><option>6</option><option>8</option></select></td></tr>
+                    <tr><td>抽奖次数：</td><td><input name="free_num" onkeyup="value=value.replace(/[^\d]/g,'')"></td></tr>
                 </tbody>
             </table>
             <input type="submit" value="提交">
@@ -32,6 +33,7 @@
                 <p>{{ act_re | safe }}</p>
             <li>奖品创建结果：</li>
                 <p>{{ awards_re | safe }}</p>
+            <li>异常错误信息：</li>
                 <p>{{ f_re |safe }}</p>
     </div>
 
