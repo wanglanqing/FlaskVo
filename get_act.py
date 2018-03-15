@@ -47,6 +47,6 @@ def get_ad_simulation_info(adid_list):
 if __name__=='__main__':
     #模拟投放接口
     # get_ad_simulation_info(['371', '372'])
-    get_ad_simulation_info(['372','371'])
+    get_ad_simulation_info(['371'])
 
 

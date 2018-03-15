@@ -4,9 +4,14 @@ import traceback
 from get_act import *
 from create_template import *
 from myException import *
-
+from confparas import *
 
 app = Flask(__name__)
+@app.route('/')
+def index():
+    print 'ok'
+    return render_template("index.html")
+
 
 @app.route('/actinfo/',methods=['POST','GET'])
 def show_act_results():
@@ -37,6 +42,7 @@ def create_act():
         act_name=request.form.get('act_name').strip()
         award_num =int(request.form.get('award_num'))
         free_num = int(request.form.get('free_num').strip())
+        request.accept_charsets
         try:
             ct = TemplateActCreation(template_type_name, act_name,award_num)
             # 创建模板类型，create_template_type(self, classifi, locationAdress, preview="https://img0.adhudong.com/template/201802/24/999337a35a1a9169450685cc66560a05.png",prizesNum=6)
@@ -69,6 +75,35 @@ def create_act():
         except Exception as e:
             traceback.print_exc()
             return render_template("create_act.html", f_re = e.message)
+
+@app.route('/jssdk/')
+def jssdk():
+    return render_template('jssdk.html')
+
+@app.route('/jssdk466/')
+def jssdk466():
+    return render_template('jssdk466.html')
+
+@app.route('/jssdk468/')
+def jssdk468():
+    return render_template('jssdk468.html')
+
+@app.route('/jssdk469/')
+def jssdk469():
+    return render_template('jssdk469.html')
+
+@app.route('/jssdk476/')
+def jssdk476():
+    return render_template('jssdk476.html')
+
+@app.route('/confparas/')
+def confparas():
+    title = u'数据库配置表'
+    qre = query_paras()
+    # q_len = len(qre)
+    # for i in range(q_len):
+    #     print()
+    return render_template('confparas.html',title = title,qre = qre)
 
 if __name__ == '__main__':
     app.run( host="0.0.0.0", port=9000, debug=True)

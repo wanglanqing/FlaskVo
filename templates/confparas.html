@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+</head>
+<body>
+
+    <table border="1" >
+        {% for i in qre %}
+        <tr>
+        {% for m in i%}
+             <td>{{ m |safe }}</td>
+        {% endfor %}
+        </tr>
+    {% endfor %}
+    </table>
+</body>
+</html>
