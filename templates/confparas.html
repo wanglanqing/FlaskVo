@@ -7,13 +7,19 @@
 <body>
 
     <table border="1" >
-        {% for i in qre %}
         <tr>
-        {% for m in i%}
-             <td>{{ m |safe }}</td>
-        {% endfor %}
+            <th>参数类型</th>
+            <th>描述</th>
+            <th>参数值</th>
+            <th>参数值类型</th>
         </tr>
-    {% endfor %}
+        {% for row in paras %}
+        <tr>
+            {% for col in row%}
+             <td>{{ col |safe }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
     </table>
 </body>
 </html>

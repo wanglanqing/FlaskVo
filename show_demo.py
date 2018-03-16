@@ -99,11 +99,8 @@ def jssdk476():
 @app.route('/confparas/')
 def confparas():
     title = u'数据库配置表'
-    qre = query_paras()
-    # q_len = len(qre)
-    # for i in range(q_len):
-    #     print()
-    return render_template('confparas.html',title = title,qre = qre)
+    paras = ConfParas().manager_paras()
+    return render_template('confparas.html', title = title, paras = paras)
 
 if __name__ == '__main__':
     app.run( host="0.0.0.0", port=9000, debug=True)
