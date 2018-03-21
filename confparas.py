@@ -6,8 +6,8 @@ from utils.db_info import *
 
 
 class ConfParas(object):
-    def __init__(self):
-        self.db = DbOperations()
+    def __init__(self, env_value):
+        self.db = DbOperations(env_value=env_value)
 
     def query_paras(self):
         q_sql = "select type, `desc`,`value`,value_type from voyager.config_parameters where status='1'"
@@ -32,9 +32,9 @@ class ConfParas(object):
                 #将list转换为字典
                 for tmp_value in value13_list:
                     value_dict[tmp_value[-1]] = tmp_value[:-2]
-                #字典按值倒序排序
+
+                #第一种方法，字典按值倒序排序
                 value13_list = sorted(value_dict.keys(), key=lambda e: e[0], reverse=True)
-                print()
                 #将value转换为a>b>c的样式
                 managed_str = '优先级由高到低依次为：<br>'
                 for item in value13_list:
@@ -43,7 +43,6 @@ class ConfParas(object):
                 #将该行数据，重新写入row()
                 for fitem in type13_row:
                     row.append(fitem)
-                # print(type13_row)
             #特殊处理type=16这一行的数据，将value值进行分类展示
             elif conf_re[row_index][0] == 16 and len(conf_re[row_index][2]) > 0:
                     type16_row = list(conf_re[row_index])
@@ -70,7 +69,7 @@ class ConfParas(object):
                 for col_index in range(conf_col_len):
                     row.append(conf_re[row_index][col_index])
             final_re.append(row)
-        print(final_re)
+        # print(final_re)
         return final_re
 
     def __del__(self):
@@ -78,4 +77,4 @@ class ConfParas(object):
         self.db.close_db()
 
 if __name__ == '__main__':
-    ConfParas().manager_paras()
+    ConfParas('False').manager_paras()

@@ -221,7 +221,7 @@ class TemplateActCreation(object):
 if __name__=='__main__':
     #为模板类型名称
     #__init__(self, templateTypeName, act_name, award_num):
-    ct = TemplateActCreation('淘粉吧转盘0301',"淘粉吧转盘0301",6)
+    ct = TemplateActCreation('九宫格读书有礼_wlq',"九宫格读书有礼_wlq",6)
     #创建模板类型，create_template_type(self, classifi, locationAdress, preview="https://img0.adhudong.com/template/201802/24/999337a35a1a9169450685cc66560a05.png",prizesNum=6)
     ct.create_template_type('https://display.adhudong.com/new/rotary_table_pink.html')
     #创建模板 ct.create_template(templateName, templateStyleUrl)
@@ -230,58 +230,3 @@ if __name__=='__main__':
     # ct.create_act()
     # #创建活动关联的奖品，
     # ct.create_awards()
-
-
-
-    # def create_act(self ):
-    #     '''
-    #     :return:
-    #     '''
-    #     post_url = "http://api.admin.adhudong.com/act/modefy.htm"
-    #     headers = {'user-agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36'}
-    #     json_body ={
-    #         "freeNum": 8,
-    #         "status": 1,
-    #         "awardNum": 3,
-    #         "expand1": 1,
-    #         "templateId": 229,
-    #         "awardList": [{
-    #             "id": "rc-award-1519523150433-85",
-    #             "priority": 1,
-    #             "awardId": "null",
-    #             "awardRate": 70,
-    #             "awardGetInstructions": "<p>&nbsp;1.实物类奖品将在活动结束后5-10个工作日内安排发货，请耐心等待；</p><p>2.卡券类奖品使用规则详见卡券介绍页&nbsp;</p>",
-    #             "actAwardType": 7,
-    #             "awardIcon": "https://img1.adhudong.com/association/201802/25/3b667fbd84149001a1c35071350e5c21.png",
-    #             "showCopy": "大礼包奖品",
-    #             "awardDetails": "<p>商品详情：</p><p>1.</p>"
-    #         }, {
-    #             "id": "rc-award-1519523102290-44",
-    #             "priority": 3,
-    #             "awardRate": 15,
-    #             "awardId": "null",
-    #             "awardGetInstructions": "<p>&nbsp;1.实物类奖品将在活动结束后5-10个工作日内安排发货，请耐心等待；</p><p>2.卡券类奖品使用规则详见卡券介绍页&nbsp;</p>",
-    #             "actAwardType": 6,
-    #             "awardIcon": "https://img0.adhudong.com/association/201802/25/10bf5888ea77ea198db1dbadc663b05f.jpg",
-    #             "showCopy": "谢谢参与",
-    #             "awardDetails": "<p>商品详情：</p><p>1.为虚拟商品</p><p>2.奖品不兑付</p>"
-    #         }, {
-    #             "id": "rc-award-1519523076018-70",
-    #             "actAwardType": 5,
-    #             "awardRate": 15,
-    #             "awardId": "null",
-    #             "priority": 2,
-    #             "showCopy": "再抽一次",
-    #             "awardIcon": "https://img4.adhudong.com/association/201802/25/49b99fca05649598059cc2dc733509f4.jpg",
-    #             "awardDetails": "<p>商品详情：</p><p>1.萨德</p><p>2.萨德</p>",
-    #             "awardGetInstructions": "<p>&nbsp;1.实物类奖品将在活动结束后5-10个工作日内安排发货，请耐心等待；</p><p>2.卡券类奖品使用规则详见卡券介绍页&nbsp;</p>"
-    #         }],
-    #         "actName": "从list6",
-    #         "changeTimes": 2,
-    #         "bannerImageUrl": "https: //img3.adhudong.com/award/201802/25/9867c921ca0178820b8a37c677876223.jpg",
-    #         "actRuleInfo": "<p>参与活动即有机会获得大奖。活动为概率中奖，奖品数量有限，祝君好运。</p><p>惊喜一：1000元现金</p><p>惊喜二：500元现金</p><p>惊喜三：200元现金</p><p>惊喜四：100元现金</p><p>惊喜五：50元现金</p><p>惊喜六：幸运奖</p><p>重要声明：</p><p>1、实物类奖品将在活动结束后5-10个工作日内安排发货，请耐心等待</p><p>2、卡券类奖品使用规则详见卡券介绍页</p><p>3、通过非法途径获得奖品的，主办方有权不提供奖品</p>"
-    #     }
-    #     res = self.s.post(post_url, data=json_body,headers=headers)
-    #     # res = self.s.get(post_url, params=json_body)
-    #     print(res.url)
-    #     print(res.text)

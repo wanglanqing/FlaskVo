@@ -96,11 +96,19 @@ def jssdk469():
 def jssdk476():
     return render_template('jssdk476.html')
 
-@app.route('/confparas/')
+# @app.route('/confparas/')
+@app.route('/confparas/', methods=['POST','GET'])
 def confparas():
     title = u'数据库配置表'
-    paras = ConfParas().manager_paras()
-    return render_template('confparas.html', title = title, paras = paras)
+    if request.method=='GET':
+        return render_template("confparas.html",title = title)
+    else:
+        env = request.form.get('env').strip()
+        print(env)
+        # env_dict={'测试环境':True,'生产环境':False}
+        env_dict={u'测试环境':True,u'生产环境':False}
+        paras = ConfParas(env_value=env_dict[env]).manager_paras()
+        return render_template('confparas.html', title = title, paras = paras,env = env)
 
 if __name__ == '__main__':
     app.run( host="0.0.0.0", port=9000, debug=True)
