@@ -203,7 +203,7 @@ class TemplateActCreation(object):
                 priority,update_time,create_time,show_copy,award_icon,act_award_type,begin_time,end_time,award_num,
                 award_details,award_get_instructions)
             VALUES (''' + act_id + award
-            # print(award_sql)
+            print(award_sql)
             try:
                 self.db.execute_sql(award_sql)
                 self.db.mycommit()

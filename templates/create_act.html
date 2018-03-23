@@ -3,14 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <title>新建模板和活动</title>
+    <script type="text/javascript">
+        function check_value() {
+            var template_adr = document.getElementsByName("template_adr").value;
+            var css_adr = document.getElementsByName('css_adr').value;
+            var template_type_name = document.getElementsByName('template_type_name').value;
+            var act_name = document.getElementsByName('act_name').value;
+            var award_num = document.getElementsByName('award_num').value;
+            var free_num = document.getElementsByName('free_num').value;
+//            console.log(template_adr);
+            if (template_adr && css_adr &&  template_type_name && act_name &&  award_num && free_num){
+                return true;
+            }else{
+                alert('请检查所有字段，不能为空啊');
+                return false;
+            }
+
+//            var result = [{template_adr:template_adr},{css_adr:css_adr},{template_type_name:template_type_name},{act_name:act_name},{award_num:award_num},{free_num:free_num}];
+//            var formResult = true;
+//            for(var i= 1,j=result.length;i<j;i++){
+//                switch (result[i].keys){
+//                    case 'template_adr':
+//                        alert('template_adr is null');
+//                        return false;
+//                    case 'css_adr':
+//                        alert('css_adr is null');
+//                        break;
+//                    case 'template_type_name':
+//                        alert('template_type_name is null');
+//                        break;
+//                    case 'act_name':
+//                        alert('act_name is null');
+//                        break;
+//                    case 'award_num':
+//                        alert('award_num is null');
+//                        break;
+//                    case 'free_num':
+//                        alert('free_num is null');
+//                        break;
+//                }
+//            }
+//            if(formResult){
+////                cb&&cb();
+//            }
+    </script>
 </head>
 <body>
-    <form action="{{ url_for('create_act')}}" method="post">
+    <form action="{{ url_for('create_act')}}" method="post" onsubmit="return check_value()">
         <div>
             <h1>请求区域</h1>
             <table border="2">
                 <tbody>
-                    <tr><td>模板地址：</td><td><input name='template_adr' type="text" style="width:420px;" placeholder="https://display.adhudong.com/new/lottery_machine.html"></td></tr>
+                    <tr><td>模板地址：</td><td><input name='template_adr' type="text" style="width:420px;" placeholder="https://display.adhudong.com/new/lottery_machine.html" onclick="chkblk(this)"></td></tr>
                     <tr><td>样式地址：</td><td><input name="css_adr" type="text" style="width: 420px" value="https://display.adhudong.com/activity/favicon.ico"></td></tr>
                     <tr><td>模板类型名称：</td><td><input name="template_type_name" type="text" style="width: 420px" value="" ></td></tr>
                     <tr><td>模板名称：</td><td><input name="temlate_name" type="text" style="width: 420px" placeholder=""></td></tr>
@@ -19,7 +63,7 @@
                     <tr><td>抽奖次数：</td><td><input name="free_num" onkeyup="value=value.replace(/[^\d]/g,'')"></td></tr>
                 </tbody>
             </table>
-            <input type="submit" value="提交">
+            <input type="submit" value="提交" >
         </div>
     </form>
 
