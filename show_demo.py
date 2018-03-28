@@ -5,6 +5,7 @@ from get_act import *
 from create_template import *
 from myException import *
 from confparas import *
+from get_act import *
 
 app = Flask(__name__)
 @app.route('/')
@@ -110,5 +111,16 @@ def confparas():
         paras = ConfParas(env_value=env_dict[env]).manager_paras()
         return render_template('confparas.html', title = title, paras = paras,env = env)
 
+@app.route('/ad_simulation/',methods=['post','get'])
+def ad_simulation():
+    title ='模拟投放接口查询'
+    if request.method == 'GET':
+        return render_template("ad_simulation.html", title=title)
+
+    else:
+        adzoneID = request.form.get('adzoneID')
+        chklist=request.form.getlist('chklist')
+        final = get_ad_simulation_info(adzoneID,chklist )
+        return  render_template("ad_simulation.html", title=title, final_k=final.keys(), final_v=final.values() )
 if __name__ == '__main__':
     app.run( host="0.0.0.0", port=9000, debug=True)
