@@ -118,9 +118,16 @@ def ad_simulation():
         return render_template("ad_simulation.html", title=title)
 
     else:
+        env_dict={u'测试环境':'T',u'生产环境':'P'}
+        env = request.form.get('env').strip()
         adzoneID = request.form.get('adzoneID')
         chklist=request.form.getlist('chklist')
-        final = get_ad_simulation_info(adzoneID,chklist )
-        return  render_template("ad_simulation.html", title=title, final_k=final.keys(), final_v=final.values() )
+        if adzoneID and isinstance(int(adzoneID),int) :
+            final = get_ad_simulation_info(adzoneID,chklist,env_value=env_dict[env] )
+        # return  render_template("ad_simulation.html", title=title, final_k=final.keys(), final_v=final.values() )
+            #chklist返回的为表头，final_k返回的为[[id,id,id],[id,id]] ，final_len返回的有多少个广告
+            return render_template("ad_simulation.html", title=title, chklist=chklist ,final_k=final.values(),final_len=range(len(final)))
+        else:
+            return render_template("ad_simulation.html", title=title,emsg='请输入广告位id')
 if __name__ == '__main__':
     app.run( host="0.0.0.0", port=9000, debug=True)
