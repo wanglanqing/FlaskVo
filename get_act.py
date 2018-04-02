@@ -53,7 +53,6 @@ def get_ad_simulation_info(adzoneId, checkedList,env_value='T'):
             return result_dict
         else:
             return '没有订单啊'
-        # return (json.dumps(result_dict, ensure_ascii=False))
 
 if __name__=='__main__':
     #模拟投放接口

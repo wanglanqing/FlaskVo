@@ -122,7 +122,6 @@ def ad_simulation():
         env = request.form.get('env').strip()
         adzoneID = request.form.get('adzoneID')
         chklist = request.form.getlist('chklist')
-        print(chklist)
         if adzoneID and chklist:
             final = get_ad_simulation_info(adzoneID,chklist,env_value=env_dict[env] )
             #chklist返回的为表头，final_k返回的为[[id,id,id],[id,id]] ，final_len返回的有多少个广告
