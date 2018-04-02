@@ -19,40 +19,45 @@ def get_ad_simulation_info(adzoneId, checkedList,env_value='T'):
     字典结构为：
     num：
     '''
-    env_dict = {'T':'101.254.242.11:1','F':'13.9.17.1:17'}
+    env_dict = {'T':'101.254.242.11:11','F':'13.9.17.1:17'}
     bidTime = datetime.datetime.now().strftime('%Y-%m-%d')
     adzoneId = str(adzoneId)
 
     re_dict={}
     if len(adzoneId)== 0 :
         return ('请输入广告位id')
+    elif len(checkedList)== 0:
+        return ('请勾选关键字')
     else:
         result_dict = {}
         url = "http://{0}/ad_simulation.do?positionId=1&adZoneId={1}&bidTime={2}".format(env_dict[env_value],adzoneId, bidTime)
         # try:
-        response = requests.get(url, cookies=mycookies).json()['data'][adzoneId]
-        # print(requests.get(url).text)
-        res_len = len(response)
-        for i in range(res_len):
-            re = response[i]
-            chk_dict = {'adOrderID': re['adOrder']['id'], 'adOrderName': re['adOrder']['name'],
-                        'adCreativeID': re['adCreative']['id'], 'adCreativeName': re['adCreative']['name'],
-                        'advertiserId': re['adCreative']['advertiserId']}
-            # tmp_dict = {}
-            tmp_list=[]
-            #取勾选项的内容
-            for chk in checkedList:
-                tmp_value = chk_dict[chk]
-                # tmp_dict[chk] = tmp_value
-                tmp_list.append(tmp_value)
-            result_dict[i] = tmp_list
-        print(result_dict)
-        return result_dict
+        print(url)
+        try:
+            response = requests.get(url, cookies=mycookies).json()['data'][adzoneId]
+            res_len = len(response)
+        except Exception as e:
+            return e
+        if res_len !=0 :
+            for i in range(res_len):
+                re = response[i]
+                chk_dict = {'adOrderID': re['adOrder']['id'], 'adOrderName': re['adOrder']['name'],
+                            'adCreativeID': re['adCreative']['id'], 'adCreativeName': re['adCreative']['name'],
+                            'advertiserId': re['adCreative']['advertiserId'],'ctr':re['ctr']}
+                tmp_list=[]
+                #筛选勾选项的内容
+                for chk in checkedList:
+                    tmp_value = chk_dict[chk]
+                    tmp_list.append(tmp_value)
+                result_dict[i] = tmp_list
+            return result_dict
+        else:
+            return '没有订单啊'
         # return (json.dumps(result_dict, ensure_ascii=False))
 
 if __name__=='__main__':
     #模拟投放接口
     # get_ad_simulation_info(['371', '372'])
-    get_ad_simulation_info(372,['adOrderID','adOrderName','adCreativeID'],'T')
+    get_ad_simulation_info(421,['adOrderID','adOrderName','adCreativeID'],'T')
 
 
