@@ -8,6 +8,9 @@ from utils.db_info import *
 class ConfParas(object):
     def __init__(self, env_value):
         self.db = DbOperations(env_value=env_value)
+    @classmethod
+    def numeric_compare(cls, x, y):
+        return x - y
 
     def query_paras(self):
         q_sql = "select type, `desc`,`value`,value_type from voyager.config_parameters where status='1'"
@@ -31,10 +34,11 @@ class ConfParas(object):
                 value_dict = {}
                 #将list转换为字典
                 for tmp_value in value13_list:
-                    value_dict[tmp_value[-1]] = tmp_value[:-2]
+                    value_dict[int(tmp_value.split('/')[1])] = tmp_value.split('/')[0]
 
                 #第一种方法，字典按值倒序排序
-                value13_list = sorted(value_dict.keys(), key=lambda e: e[0], reverse=True)
+                # value13_list = sorted(value_dict.keys(), key=lambda e: e[0], reverse=True)
+                value13_list = sorted(value_dict.keys(), cmp=ConfParas.numeric_compare, reverse=True)
                 #将value转换为a>b>c的样式
                 managed_str = '优先级由高到低依次为：<br>'
                 for item in value13_list:
@@ -65,6 +69,27 @@ class ConfParas(object):
                     #将该行数据，重新写入row
                     for fitem in type16_row:
                         row.append(fitem)
+            elif conf_re[row_index][0] == 18 and len(conf_re[row_index][2]) > 0:
+                type18_row = list(conf_re[row_index])
+                # 取出type=13的value值，将unicode转换为str，通过split转换为list
+                value18_list = type18_row[2].encode("utf-8").split(',')
+                type18_row.pop(2)
+                value_dict = {}
+                # 将list转换为字典
+                for tmp_value in value18_list:
+                    value_dict[int(tmp_value.split('/')[1])] = tmp_value.split('/')[0]
+
+                # 第一种方法，字典按值倒序排序
+                # value13_list = sorted(value_dict.keys(), key=lambda e: e[0], reverse=True)
+                value18_list = sorted(value_dict.keys(), cmp=ConfParas.numeric_compare, reverse=True)
+                # 将value转换为a>b>c的样式
+                managed_str = '优先级由高到低依次为：<br>'
+                for item in value13_list:
+                    managed_str += str(value_dict[item]) + ' > '
+                type18_row.insert(2, managed_str[:-2])
+                # 将该行数据，重新写入row()
+                for fitem in type18_row:
+                    row.append(fitem)
             else:
                 for col_index in range(conf_col_len):
                     row.append(conf_re[row_index][col_index])
@@ -77,4 +102,4 @@ class ConfParas(object):
         self.db.close_db()
 
 if __name__ == '__main__':
-    ConfParas('False').manager_paras()
+    ConfParas(True).manager_paras()

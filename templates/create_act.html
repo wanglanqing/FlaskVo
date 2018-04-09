@@ -1,3 +1,4 @@
+{% extends "base.html"%}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,6 +24,7 @@
     </script>
 </head>
 <body>
+{% block main %}
     <form action="{{ url_for('create_act')}}" method="post" onsubmit="return check_value()">
         <div>
             <h1>请求区域</h1>
@@ -54,6 +56,6 @@
             <li>异常错误信息：</li>
                 <p>{{ f_re |safe }}</p>
     </div>
-
+{% endblock %}
 </body>
 </html>

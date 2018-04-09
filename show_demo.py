@@ -121,13 +121,15 @@ def ad_simulation():
         env_dict={u'测试环境':'T', u'生产环境':'P'}
         env = request.form.get('env').strip()
         adzoneID = request.form.get('adzoneID')
+        adOrderID = request.form.get('adOrderId')
         chklist = request.form.getlist('chklist')
         if adzoneID and chklist:
-            final = get_ad_simulation_info(adzoneID,chklist,env_value=env_dict[env] )
+            final = get_ad_simulation_info(adzoneID, adOrderID, chklist, env_value=env_dict[env])
+            print('===========',final)
             #chklist返回的为表头，final_k返回的为[[id,id,id],[id,id]] ，final_len返回的有多少个广告
             if isinstance(final,dict):
+            # if adzoneID in final:
                 chklist.insert(0, u'序号')
-                print(chklist)
                 return render_template("ad_simulation.html", title=title, chklist=chklist ,final_k=final.values(),final_len=range(len(final)))
             else:
                 return render_template("ad_simulation.html", title=title, emsg=final)
