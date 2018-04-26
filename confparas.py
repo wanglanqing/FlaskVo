@@ -56,14 +56,17 @@ class ConfParas(object):
                     type16_row.pop(2)
                     #使用set(), 进行分类
                     for value16_item in value16_list:
-                        ad_count_set.add(value16_item[-1])
+                        ad_count_set.add(value16_item.split('/')[1])
                     #根据分类结果，遍历value值，进行汇总
                     re16 = ''
                     for ad_count_set in ad_count_set:
                         tmp = ''
                         for value16_item in value16_list:
+                            print(value16_item)
                             if value16_item.endswith('/' + ad_count_set):
-                                tmp += value16_item[:-2] + ', '
+                                # tmp += value16_item[:-2] + ', '
+                                tmp += value16_item.split('/')[0] + ', '
+                                print(tmp)
                         re16 += '需要展示' + ad_count_set + '个广告的活动为：' + tmp[:-2] + '<br>'
                     type16_row.insert(2, re16)
                     #将该行数据，重新写入row
@@ -84,7 +87,7 @@ class ConfParas(object):
                 value18_list = sorted(value_dict.keys(), cmp=ConfParas.numeric_compare, reverse=True)
                 # 将value转换为a>b>c的样式
                 managed_str = '优先级由高到低依次为：<br>'
-                for item in value13_list:
+                for item in value18_list:
                     managed_str += str(value_dict[item]) + ' > '
                 type18_row.insert(2, managed_str[:-2])
                 # 将该行数据，重新写入row()
