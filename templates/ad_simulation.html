@@ -71,6 +71,15 @@
     <div>
         {{ emsg}}
     </div>
+    <table border="1">
+            {% for no in knowledge %}
+            <tr>
+                {% for item in no %}
+                <td>{{ item }}</td>
+                {% endfor %}
+           </tr>
+            {% endfor %}
+    </table>
 {% endblock %}
 </body>
 </html>

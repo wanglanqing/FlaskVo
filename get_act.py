@@ -19,7 +19,7 @@ def get_ad_simulation_info(adzoneId, adOrderId,checkedList,env_value='T'):
     字典结构为：
     num：
     '''
-    env_dict = {'T':'101.254.22.11:191','P':'12.59.1.106:100'}
+    env_dict = {'T':'101.254.242.11:17091','P':'123.59.17.106:17200'}
     bidTime = datetime.datetime.now().strftime('%Y-%m-%d')
     adzoneId = str(adzoneId)
     adOrderId = str(adOrderId)
@@ -62,6 +62,41 @@ def get_ad_simulation_info(adzoneId, adOrderId,checkedList,env_value='T'):
                 return response
         except Exception as e:
             return e
+
+def knowlegde():
+    know = [
+        [u"英文描述", u'代号', u'原因描述', u'编号', u'解决方式'],
+        ["AD__REPEAT", "A", u"同一用户cookie24小时内重复展现", "0", u""],
+        ["AD__UNAVAILABLE", "B", u"订单无效或当前时间不可投放", "1", u""],
+        ["AD__NO_BUDGET", "C", u"今日没有预算", "2", u"在广告主前台，给广告主增加预算"],
+        ["AD__LACK_BUDGET", "D", u"预算已不足", "3", u"在广告主前台，给广告主增加预算"],
+        ["AD__WRONG_STATUS", "E", u"投放状态错误（冻结或暂停或结束）", "4", u"开启暂停状态的订单"],
+        ["AD__LOW_PRICE", "F", u"出价过低", "5", u"在广告主前台，调高订单的出价"],
+        ["AD__ADV_INVALID", "G", u"订单对应广告主无效或状态错误", "6", u""],
+        ["AD__ADP_INVALID", "H", u"订单对应广告计划无效或错误", "7", u""],
+        ["AD__ADZ_FILTER", "I", u"被此广告位定向过滤过滤", "8", u"在运营后台，查看该广告位的屏蔽信息"],
+        ["AD__URL_FILTER", "J", u"被此广告位URL定向过滤", "9", u"在运营后台，查看该广告位的屏蔽信息"],
+        ["AD__UNSUIT", "K", u"该订单过滤该广告位媒体", "10", u""],
+        ["AD__REGION_FILTER", "L", u"被订单的地域限制过滤", "11", u""],
+        ["AD__DEVICE_FILTER", "M", u"被订单的设备限制过滤", "12", u""],
+        ["AD__USER_FREQ", "N", u"被用户频次限制过滤", "13", u""],
+        ["AD__POS_UNSUIT", "O", u"坑位类型不匹配", "14", u""],
+        ["AD__LACK_LINK", "P", u"没有广告着陆页地址", "15", u""],
+        ["AD__REPEAT_LINK", "Q", u"广告链接重复", "16", u""],
+        ["AD__BLOCKED_LINK", "R", u"广告着陆页域名被封", "17", u""],
+        ["AD__SIMILAR_PIC", "S", u"广告图片相似", "18", u""],
+        ["AD__CRE_INVALID", "T", u"创意无效或状态错误", "19", u""],
+        ["AD__OCC_CONFIG", "U", u"被广告位次配置过滤", "20", u""],
+        ["AD__NO_HOUR_BUDGET", "V", u"没有小时预算", "21", u""],
+        ["AD__LACK_HOUR_BUDGET","W", u"小时预算不足", "22",u""],
+        ["AD_Z_CRE_LV_UNSUIT", "X", u"广告位和广告创意等级不匹配", "23", u""],
+        ["AD__SEC_TIME_FILTER", "Y", u"隐藏过滤时间", "24", u""],
+        ["AD__SEC_REG_FILTER", "Z", u"隐藏过滤地域", "25", u""],
+        ["AD__QUALITY_FILTER", "a", u"广告订单媒体资质定向不符", "27", u""],
+        ["AD__MEDADZ_FILTER", "b", u"广告订单媒体广告位定向不符", "28",u""]
+    ]
+    # know='同一用户cookie24小时内重复展现'
+    return know
 if __name__=='__main__':
     #模拟投放接口
     # get_ad_simulation_info(['371', '372'])

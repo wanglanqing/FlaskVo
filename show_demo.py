@@ -8,6 +8,8 @@ from confparas import *
 from get_act import *
 
 app = Flask(__name__)
+global env_dict
+env_dict={u'测试环境':True,u'生产环境':False}
 @app.route('/')
 def index():
     print 'ok'
@@ -81,23 +83,6 @@ def create_act():
 def jssdk():
     return render_template('jssdk.html')
 
-@app.route('/jssdk466/')
-def jssdk466():
-    return render_template('jssdk466.html')
-
-@app.route('/jssdk468/')
-def jssdk468():
-    return render_template('jssdk468.html')
-
-@app.route('/jssdk469/')
-def jssdk469():
-    return render_template('jssdk469.html')
-
-@app.route('/jssdk476/')
-def jssdk476():
-    return render_template('jssdk476.html')
-
-# @app.route('/confparas/')
 @app.route('/confparas/', methods=['POST','GET'])
 def confparas():
     title = u'数据库配置表'
@@ -107,7 +92,8 @@ def confparas():
         env = request.form.get('env').strip()
         print(env)
         # env_dict={'测试环境':True,'生产环境':False}
-        env_dict={u'测试环境':True,u'生产环境':False}
+        env_dict={u'测试环境':True, u'生产环境':False}
+        print(env_dict[env])
         paras = ConfParas(env_value=env_dict[env]).manager_paras()
         return render_template('confparas.html', title = title, paras = paras,env = env)
 
@@ -132,8 +118,25 @@ def ad_simulation():
                 chklist.insert(0, u'序号')
                 return render_template("ad_simulation.html", title=title, chklist=chklist ,final_k=final.values(),final_len=range(len(final)))
             else:
-                return render_template("ad_simulation.html", title=title, emsg=final)
+                print( u'序号')
+                return render_template("ad_simulation.html", title=title, emsg=final, knowledge=knowlegde())
         else:
             return render_template("ad_simulation.html", title=title,emsg='请输入广告位id或勾选关键字')
+
+@app.route('/AAS/',methods=['post', 'get'])
+# @app.route('/ad_simulation/',methods=['post','get'])
+def act_template():
+    title = '通过模板查询活动'
+
+    #获取前台传入的参数
+    newframe = request.form.getlist('newframe')
+    oldframe = request.form.getlist('oldframe')
+    env = request.form.get('env')
+
+    # return render_template("act_template.html", title=title, newframe=newframe, oldframe=oldframe)
+    return render_template("act_template.html")
+
+
+
 if __name__ == '__main__':
     app.run( host="0.0.0.0", port=9000, debug=True)
