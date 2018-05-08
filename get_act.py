@@ -4,6 +4,7 @@
 
 import requests,datetime
 import sys,json
+from hdt_tools.utils.db_info import *
 defaultencoding = 'utf-8'
 if sys.getdefaultencoding() != defaultencoding:
     reload(sys)
@@ -69,7 +70,7 @@ def knowlegde():
         ["AD__REPEAT", "A", u"同一用户cookie24小时内重复展现", "0", u""],
         ["AD__UNAVAILABLE", "B", u"订单无效或当前时间不可投放", "1", u""],
         ["AD__NO_BUDGET", "C", u"今日没有预算", "2", u"在广告主前台，给广告主增加预算"],
-        ["AD__LACK_BUDGET", "D", u"预算已不足", "3", u"在广告主前台，给广告主增加预算"],
+        ["AD__LACK_BUDGET", "D", u"预算已不足", "3", u"在广告主前台，广告订单列表，修改订单的每日预算信息"],
         ["AD__WRONG_STATUS", "E", u"投放状态错误（冻结或暂停或结束）", "4", u"开启暂停状态的订单"],
         ["AD__LOW_PRICE", "F", u"出价过低", "5", u"在广告主前台，调高订单的出价"],
         ["AD__ADV_INVALID", "G", u"订单对应广告主无效或状态错误", "6", u""],
@@ -97,9 +98,89 @@ def knowlegde():
     ]
     # know='同一用户cookie24小时内重复展现'
     return know
+
+def get_tuodi_ads():
+    # sql = "select `value` from voyager.config_parameters where id=13"
+    sql = "select * from voyager.config_parameters where id=13"
+    ads = DbOperations().execute_sql(sql)[0][3]
+    ads_list=[]
+    # print(ads)
+    print()
+    ads_tmp = (ads).split(',')
+    print(ads_tmp)
+    for i in range(len(ads_tmp)):
+        ads_list.append(ads_tmp[i].split('/')[0])
+    return ads_list
+
+def get_info():
+    url="http://123.59.17.106:17200/ad_simulation.do?positionId=1&adZoneId=1370&bidTime=2018-05-03&adOrderId="
+    aos=['16495',
+'14549',
+'16241',
+'13428',
+'13429',
+'14386',
+'16479',
+'17377',
+'17378',
+'17528',
+'17952',
+'17953',
+'14033',
+'14862',
+'16398',
+'17523',
+'17731',
+'17910',
+'18017',
+'11632',
+'13957',
+'17150',
+'17979',
+'16162',
+'17622',
+'13376',
+'14831',
+'14833',
+'16379',
+'14634',
+'14670',
+'14863',
+'15033',
+'15488',
+'16207',
+'14807',
+'14846',
+'14847',
+'15053',
+'15073',
+'15218',
+'15659',
+'16404',
+'16405',
+'14942',
+'14946',
+'15500',
+'17047',
+'17083',
+'15264',
+'15647',
+'17665',
+'17680',
+'17913',
+'17983']
+    for item in aos:
+        print(item +' results:')
+        url_new = url+str(item)
+        re= requests.get(url_new).text
+        print(re)
+
+
 if __name__=='__main__':
     #模拟投放接口
     # get_ad_simulation_info(['371', '372'])
-    print(get_ad_simulation_info(372,'',['adOrderID','adOrderName','adCreativeID'],'T'))
+    # print(get_ad_simulation_info(372,'',['adOrderID','adOrderName','adCreativeID'],'T'))
+    # get_tuodi_ads()
+    get_info()
 
 

@@ -119,7 +119,7 @@ def ad_simulation():
                 return render_template("ad_simulation.html", title=title, chklist=chklist ,final_k=final.values(),final_len=range(len(final)))
             else:
                 print( u'序号')
-                return render_template("ad_simulation.html", title=title, emsg=final, knowledge=knowlegde())
+                return render_template("ad_simulation.html", title=title, emsg=final, knowledge=knowlegde(), tuodi_ads= get_tuodi_ads())
         else:
             return render_template("ad_simulation.html", title=title,emsg='请输入广告位id或勾选关键字')
 

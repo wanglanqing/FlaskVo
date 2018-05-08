@@ -17,7 +17,7 @@ class TemplateActCreation(object):
         :return:
         '''
         self.s = requests.session()
-        self.s.get('http://api.admin.adhudong.com/login/login_in.htm?name=test&pwd=qq')
+        self.s.get('http://api.admin.adhudong.com/login/login_in.htm?name=test&pwd=!Qq123456')
         self.templateTypeName = templateTypeName
         self.act_name = act_name
         self.award_num = award_num

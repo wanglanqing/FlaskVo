@@ -42,9 +42,9 @@
                 <td><input type="text"  name="adOrderId" onkeyup="value=value.replace(/[^\d]/g,'')" ng-pattern="/[^a-zA-Z]/" autocomplete="off" placeholder="请输入订单id,如961"</td>
                 <td><input type="checkbox" value="adOrderID" name="chklist" checked></td>
                 <td><input type="checkbox" value="adOrderName" name="chklist"></td>
-                <td><input type="checkbox" value="adCreativeID" name="chklist"></td>
+                <td><input type="checkbox" value="adCreativeID" name="chklist" checked></td>
                 <td><input type="checkbox" value="adCreativeName" name="chklist"></td>
-                <td><input type="checkbox" value="advertiserId" name="chklist"></td>
+                <td><input type="checkbox" value="advertiserId" name="chklist" checked></td>
                 <td><input type="checkbox" value="ctr" name="chklist"></td>
             </tr>
         </table>
@@ -73,9 +73,17 @@
     </div>
     <table border="1">
             {% for no in knowledge %}
-            <tr>
+                {% if emsg in no %}
+            <tr style="background-color: hotpink">
+            {% else %}
+                    <tr>
+            {% endif %}
                 {% for item in no %}
-                <td>{{ item }}</td>
+{#                    {% if item == emsg %}#}
+{#                        <td style="background-color: hotpink">{{ item }}</td>#}
+{#                    {% else %}#}
+                        <td>{{ item }}</td>
+{#                    {% endif %}#}
                 {% endfor %}
            </tr>
             {% endfor %}
