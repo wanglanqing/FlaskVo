@@ -100,11 +100,12 @@ class TemplateActCreation(object):
         #     #     return e
 
 
-    def create_template(self,templateName, templateStyleUrl, positionId=1):
+    def create_template(self,templateName, templateStyleUrl, positionId=1, template_conf_items=None):
         '''
         :param templateName，模板名称
         :param templateStyleUrl， 模板样式地址，css
         :param positionId ，坑位
+        :template_conf_items,  默认为空，接收前台传入的参数
         '''
         templateTypeId=self.get_templateTypeId()
         post_url ="http://api.admin.adhudong.com/template/modefy.htm"
@@ -113,9 +114,11 @@ class TemplateActCreation(object):
             "templateTypeId": templateTypeId,
             "templateName": templateName,
             "templateStyleUrl" : templateStyleUrl,
-            "templateStyleImage" : "https://img3.adhudong.com/template/201802/25/2c6f4700db7982447348db4d0960e3ad.png"
+            "templateStyleImage" : "https://img3.adhudong.com/template/201802/25/2c6f4700db7982447348db4d0960e3ad.png",
+            "remark":template_conf_items
         }
         re = self.s.post(post_url, data=json_body)
+
         print(sys.argv[0], re)
         return re
         # if re.json()['code'] == 200:
@@ -218,14 +221,47 @@ class TemplateActCreation(object):
         self.db.close_cursor()
         self.db.close_db()
 
+
+    def create_volidate_info(self):
+        sql = "select id from voyager.advertiser where type=2 and state in (2,3,5) limit 15"
+        adv_ids = self.db.execute_sql(sql)
+        adv_id = ''
+        post_url = "http://api.admin.adhudong.com/adver/violationInsert.htm"
+
+        adv_count = len(adv_ids)
+        for i in range(adv_count):
+            adv_id = str(adv_ids[i][0])
+            remark = '测试违规记录分页数据'+str(i)
+            params = {'violationType': '1',
+                      'violationRemark': remark,
+                      'violationLink': 'http://music.baidu.com/songlist/tag/%E7%BA%AF%E9%9F%B3%E4%B9%90?orderType=1',
+                      'advertiserId': adv_id
+                      }
+            print(params)
+            # re = self.s.post(post_url, data=params)
+            # print(re.url)
+
+    def get_list(self):
+        url = "http://api.admin.adhudong.com/advertiser/creativelist.htm?page=1&page_size=200"
+        re = self.s.get(url).json()['data']['data']
+        re_len = len(re)
+        # print(re)
+        for i in range(re_len):
+            print(re[i]['id'],re[i]['state'], re[i]['lastSubReviewTime'], re[i]['createTime'])
+            # print(re[i]['state'])
+
 if __name__=='__main__':
     #为模板类型名称
     #__init__(self, templateTypeName, act_name, award_num):
-    ct = TemplateActCreation('九宫格读书有礼_wlq',"九宫格读书有礼_wlq",6)
+    ct = TemplateActCreation('九宫格ce2',"九宫格ce2",8)
     #创建模板类型，create_template_type(self, classifi, locationAdress, preview="https://img0.adhudong.com/template/201802/24/999337a35a1a9169450685cc66560a05.png",prizesNum=6)
-    ct.create_template_type('https://display.adhudong.com/new/rotary_table_pink.html')
+    ct.create_template_type('https://display.adhudong.com/new/nineBlockBox.html')
+    # ct.get_list()
     #创建模板 ct.create_template(templateName, templateStyleUrl)
-    # ct.create_template('淘粉吧转盘_0301',"https://display.adhudong.com/activity/favicon.ico")
+    ct.create_template('九宫格ce2',"https://display.adhudong.com/new/nineBlockBox.html",template_conf_items=r'''背景(750*1206)|bg|image||1|\n
+    全屏底色|bodyBgColor|string||0|\n
+    剩余次数文字颜色|leftTimesColor|string||0|/n
+剩余次数数字颜色|leftTimesNumColor|string||0|)''')
     # #创建活动，    create_act(self, act_name,free_num=20, award_num=6)
     # ct.create_act()
     # #创建活动关联的奖品，

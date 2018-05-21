@@ -42,6 +42,8 @@ def create_act():
         css_adr =  request.form.get('css_adr').strip()
         template_type_name=request.form.get('template_type_name').strip()
         temlate_name=request.form.get('temlate_name').strip()
+        #增加模板配置字段
+        template_conf_items= str(request.form.get('template_conf_items')).strip()
         act_name=request.form.get('act_name').strip()
         award_num =int(request.form.get('award_num'))
         free_num = int(request.form.get('free_num').strip())
@@ -56,11 +58,13 @@ def create_act():
                 raise myException('create_template_type ', template_type_re.text)
 
             # 创建模板 ct.create_template(templateName, templateStyleUrl)
-            temlate_name_re = ct.create_template(temlate_name, css_adr)
+            temlate_name_re = ct.create_template(temlate_name, css_adr, template_conf_items=template_conf_items)
+            print(temlate_name_re)
             if temlate_name_re.json()['code'] == 200:
                 temlate_name_fe = '创建模板【' + temlate_name + '】,成功了，返回结果是: \n' + temlate_name_re.text
             else:
-                raise myException('create_template ', temlate_name_re.text)
+                # raise myException('create_template ', temlate_name_re.text)
+                raise myException('create_template ', temlate_name_re)
 
             # # 创建活动，create_act(self, act_name,free_num=20, award_num=6)
             act_re = ct.create_act(free_num)

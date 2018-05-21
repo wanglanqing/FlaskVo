@@ -4,7 +4,7 @@
 
 import requests,datetime
 import sys,json
-from hdt_tools.utils.db_info import *
+from utils.db_info import *
 defaultencoding = 'utf-8'
 if sys.getdefaultencoding() != defaultencoding:
     reload(sys)
@@ -73,7 +73,7 @@ def knowlegde():
         ["AD__LACK_BUDGET", "D", u"预算已不足", "3", u"在广告主前台，广告订单列表，修改订单的每日预算信息"],
         ["AD__WRONG_STATUS", "E", u"投放状态错误（冻结或暂停或结束）", "4", u"开启暂停状态的订单"],
         ["AD__LOW_PRICE", "F", u"出价过低", "5", u"在广告主前台，调高订单的出价"],
-        ["AD__ADV_INVALID", "G", u"订单对应广告主无效或状态错误", "6", u""],
+        ["AD__ADV_INVALID", "G", u"订单对应广告主无效或状态错误", "6", u"广告主被冻结"],
         ["AD__ADP_INVALID", "H", u"订单对应广告计划无效或错误", "7", u""],
         ["AD__ADZ_FILTER", "I", u"被此广告位定向过滤过滤", "8", u"在运营后台，查看该广告位的屏蔽信息"],
         ["AD__URL_FILTER", "J", u"被此广告位URL定向过滤", "9", u"在运营后台，查看该广告位的屏蔽信息"],
