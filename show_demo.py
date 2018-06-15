@@ -6,8 +6,16 @@ from create_template import *
 from myException import *
 from confparas import *
 from get_act import *
+from FlaskVv.business_modle.querytool.plantfromwtf import TestCaseForm
+from FlaskVv.hdt_tools.utils.db_info import *
+from hdt_tools.utils.db_info import *
+# from business_modle.querytool import bidding_analysis as ba
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 app = Flask(__name__)
+app.config.from_object('config')
 global env_dict
 env_dict={u'测试环境':True,u'生产环境':False}
 @app.route('/')
@@ -140,6 +148,41 @@ def act_template():
     # return render_template("act_template.html", title=title, newframe=newframe, oldframe=oldframe)
     return render_template("act_template.html")
 
+@app.route('/apiTestCase/', methods=('POST','GET'))
+def TestCase():
+    form = TestCaseForm()
+    # db = DbOperations()
+    print form.is_submitted()
+    if form.is_submitted():
+        sql_data = form.data
+        sql_data.pop('csrf_token')
+        sql_data.pop('submit')
+        keys = tuple(sql_data.keys())
+        values = tuple(sql_data.values())
+        tmp_values = []
+        for value in sql_data.values():
+            tmp_values.append(str(value).encode('utf-8'))
+        ff = tuple(tmp_values)
+        print ff
+        # sql_data = json.dumps(sql_data, encoding="UTF-8")
+        # sql = r"-- INSERT INTO test.testcase_adv %s VALUES  %s"  %(keys, ff)
+        sql = r"INSERT INTO test.testcase_adv {0} VALUES ".format(keys).replace("'","")
+
+        print sql + str(ff)
+        # db.execute_sql(sql)
+        # db.mycommit()
+        return render_template('testCase.html',  form = form, name = ' '.join(sql_data))
+    return render_template('testCase.html', form = form,tigat = 'zenmml wey')
+
+# @app.route('/voyagerlog1/',methods=('POST','GET'))
+# def voyagerlog1():
+#     form = ft.MyForm()
+#     tmpdit=''
+#     if form.validate_on_submit():
+#         zclk=form.data['adzoneClickid']
+#         tmpdit=ba.orderbylognew(zclk)
+#         return render_template('voyagerlog1.html',form=form,data=tmpdit)
+#     return render_template('voyagerlog1.html',form=form)
 
 
 if __name__ == '__main__':
