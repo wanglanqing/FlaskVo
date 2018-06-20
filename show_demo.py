@@ -131,7 +131,7 @@ def ad_simulation():
                 return render_template("ad_simulation.html", title=title, chklist=chklist ,final_k=final.values(),final_len=range(len(final)))
             else:
                 print( u'序号')
-                return render_template("ad_simulation.html", title=title, emsg=final, knowledge=knowlegde(), tuodi_ads= get_tuodi_ads())
+                return render_template("ad_simulation.html", title=title, emsg=final, knowledge=knowlegde())
         else:
             return render_template("ad_simulation.html", title=title,emsg='请输入广告位id或勾选关键字')
 
@@ -151,28 +151,20 @@ def act_template():
 @app.route('/apiTestCase/', methods=('POST','GET'))
 def TestCase():
     form = TestCaseForm()
-    # db = DbOperations()
-    print form.is_submitted()
+    db = DbOperations()
     if form.is_submitted():
         sql_data = form.data
         sql_data.pop('csrf_token')
         sql_data.pop('submit')
         keys = tuple(sql_data.keys())
-        values = tuple(sql_data.values())
-        tmp_values = []
-        for value in sql_data.values():
-            tmp_values.append(str(value).encode('utf-8'))
-        ff = tuple(tmp_values)
-        print ff
-        # sql_data = json.dumps(sql_data, encoding="UTF-8")
-        # sql = r"-- INSERT INTO test.testcase_adv %s VALUES  %s"  %(keys, ff)
-        sql = r"INSERT INTO test.testcase_adv {0} VALUES ".format(keys).replace("'","")
-
-        print sql + str(ff)
-        # db.execute_sql(sql)
-        # db.mycommit()
+        values_list = json.dumps(sql_data.values(), encoding='utf-8', ensure_ascii=False)
+        sql = r"INSERT INTO test.testcase_adv {} VALUES ".format(keys).replace("'","`")
+        sql = sql + "("  + values_list[1:-1] +")"
+        print sql
+        db.execute_sql(sql)
+        db.mycommit()
         return render_template('testCase.html',  form = form, name = ' '.join(sql_data))
-    return render_template('testCase.html', form = form,tigat = 'zenmml wey')
+    return render_template('testCase.html', form = form)
 
 # @app.route('/voyagerlog1/',methods=('POST','GET'))
 # def voyagerlog1():
@@ -186,4 +178,5 @@ def TestCase():
 
 
 if __name__ == '__main__':
+    # app.config['JSON_AS_ASCII'] = False
     app.run( host="0.0.0.0", port=9000, debug=True)

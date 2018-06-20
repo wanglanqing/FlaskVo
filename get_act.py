@@ -112,75 +112,11 @@ def get_tuodi_ads():
         ads_list.append(ads_tmp[i].split('/')[0])
     return ads_list
 
-def get_info():
-    url="http://123.59.17.106:17200/ad_simulation.do?positionId=1&adZoneId=1370&bidTime=2018-05-03&adOrderId="
-    aos=['16495',
-'14549',
-'16241',
-'13428',
-'13429',
-'14386',
-'16479',
-'17377',
-'17378',
-'17528',
-'17952',
-'17953',
-'14033',
-'14862',
-'16398',
-'17523',
-'17731',
-'17910',
-'18017',
-'11632',
-'13957',
-'17150',
-'17979',
-'16162',
-'17622',
-'13376',
-'14831',
-'14833',
-'16379',
-'14634',
-'14670',
-'14863',
-'15033',
-'15488',
-'16207',
-'14807',
-'14846',
-'14847',
-'15053',
-'15073',
-'15218',
-'15659',
-'16404',
-'16405',
-'14942',
-'14946',
-'15500',
-'17047',
-'17083',
-'15264',
-'15647',
-'17665',
-'17680',
-'17913',
-'17983']
-    for item in aos:
-        print(item +' results:')
-        url_new = url+str(item)
-        re= requests.get(url_new).text
-        print(re)
 
-
-if __name__=='__main__':
-    #模拟投放接口
+# if __name__=='__main__':
     # get_ad_simulation_info(['371', '372'])
     # print(get_ad_simulation_info(372,'',['adOrderID','adOrderName','adCreativeID'],'T'))
     # get_tuodi_ads()
-    get_info()
+
 
 
