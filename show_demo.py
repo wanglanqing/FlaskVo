@@ -10,6 +10,7 @@ from FlaskVv.business_modle.querytool.plantfromwtf import TestCaseForm
 from FlaskVv.hdt_tools.utils.db_info import *
 from hdt_tools.utils.db_info import *
 # from business_modle.querytool import bidding_analysis as ba
+from FlaskVv.business_modle.apitool.apiTool import *
 
 import sys
 reload(sys)
@@ -148,7 +149,8 @@ def act_template():
     # return render_template("act_template.html", title=title, newframe=newframe, oldframe=oldframe)
     return render_template("act_template.html")
 
-@app.route('/apiTestCase/', methods=('POST','GET'))
+# @app.route('/apiTestCase/', methods=('POST','GET'))
+@app.route('/Api_index/testCase/', methods=('POST','GET'))
 def TestCase():
     form = TestCaseForm()
     db = DbOperations()
@@ -166,15 +168,18 @@ def TestCase():
         return render_template('testCase.html',  form = form, name = ' '.join(sql_data))
     return render_template('testCase.html', form = form)
 
-# @app.route('/voyagerlog1/',methods=('POST','GET'))
-# def voyagerlog1():
-#     form = ft.MyForm()
-#     tmpdit=''
-#     if form.validate_on_submit():
-#         zclk=form.data['adzoneClickid']
-#         tmpdit=ba.orderbylognew(zclk)
-#         return render_template('voyagerlog1.html',form=form,data=tmpdit)
-#     return render_template('voyagerlog1.html',form=form)
+
+@app.route('/Api_index/')
+def api_index():
+    return render_template('apiStatic.html')
+
+@app.route('/Api_index/<sub_system>/')
+def sub_system(sub_system):
+    print sub_system
+    title = sub_system
+    at = Api()
+    static_data = at.query_api_static_info(sub_system)
+    return render_template('sub_system_static.html',title = title, static_data = static_data, static_count = len(static_data) )
 
 
 if __name__ == '__main__':
