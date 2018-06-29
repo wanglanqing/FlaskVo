@@ -22,6 +22,8 @@ class TemplateActCreation(object):
         self.act_name = act_name
         self.award_num = award_num
         self.db = DbOperations()
+        self.adzone = 467
+        self.appkey="https://display.adhudong.com/site_login_ijf.htm?app_key=adhu48787abbd74d4808"
 
     def get_actId(self):
         '''
@@ -249,6 +251,15 @@ class TemplateActCreation(object):
         for i in range(re_len):
             print(re[i]['id'],re[i]['state'], re[i]['lastSubReviewTime'], re[i]['createTime'])
             # print(re[i]['state'])
+
+    def adzone_act(self):
+        dsql=r"delete from voyager.adzone_act where adzone_id in ({});".format(self.adzone)
+        self.db.execute_sql(dsql)
+        isql=r'''INSERT  INTO voyager.adzone_act (adzone_id,act_id,act_begin_time, act_end_time,priority ) VALUES
+            ( '{}','{}','2018-06-20 00:00:00', '2019-09-21 00:00:00', '1' );'''.format(self.adzone, self.get_actId())
+        self.db.execute_sql(isql)
+        return self.appkey
+
 
 if __name__=='__main__':
     #为模板类型名称

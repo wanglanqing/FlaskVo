@@ -23,12 +23,17 @@ class Api(object):
     def query_case(self):
         pass
 
-    def query_api_static_info(self, sub_system):
+    def query_api_stat_detail(self, sub_system):
         print sub_system
         sql = r'''select `group`,`actresult`,apiname,count(*) from test.testcase_adv a where a.`group`='{}'  group by  a.apiname,a.actresult;'''.format(sub_system)
         re = self.db.execute_sql(sql)
         return re
         pass
+
+    def query_api_stat_summary(self,sub_system):
+        sql =r"select count(*) from test.testcase_adv a where `group`='{}' and apiState=1;".format(sub_system)
+        re = self.db.execute_sql(sql)
+        return re
 
     def __del__(self):
         pass

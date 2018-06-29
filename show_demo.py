@@ -87,7 +87,10 @@ def create_act():
             awards_re = ct.create_awards()
             print(awards_re)
             # return render_template("create_act.html",  act_re=template_type_fe, awards_re =awards_re )
-            return render_template("create_act.html", template_type_re=template_type_fe, temlate_name_re=temlate_name_fe , act_re=act_fe, awards_re =awards_re )
+
+            ##关联广告位
+            adzone_re = ct.adzone_act()
+            return render_template("create_act.html", template_type_re=template_type_fe, temlate_name_re=temlate_name_fe , act_re=act_fe, awards_re =awards_re ,adzone_re=adzone_re)
         except Exception as e:
             traceback.print_exc()
             return render_template("create_act.html", f_re = e.message)
@@ -171,14 +174,24 @@ def TestCase():
 
 @app.route('/Api_index/')
 def api_index():
-    return render_template('apiStatic.html')
+    at = Api()
+    #定义一份子系统
+    sub_system_list = ['hdt_demand','hdt_admin','hdt_displaynode','egou','yiqigou']
+    #存储summary表格的数据
+    finished_count = {}
+    for item in sub_system_list:
+        finished= str(at.query_api_stat_summary(item)[0][0])
+        if finished :
+            finished_count[item]=finished
+    # print finished_count
+    return render_template('apiStatic.html', sub_system=finished_count.keys(),finished=finished_count.values())
 
 @app.route('/Api_index/<sub_system>/')
 def sub_system(sub_system):
     print sub_system
     title = sub_system
     at = Api()
-    static_data = at.query_api_static_info(sub_system)
+    static_data = at.query_api_stat_detail(sub_system)
     return render_template('sub_system_static.html',title = title, static_data = static_data, static_count = len(static_data) )
 
 
