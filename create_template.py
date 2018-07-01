@@ -22,8 +22,8 @@ class TemplateActCreation(object):
         self.act_name = act_name
         self.award_num = award_num
         self.db = DbOperations()
-        self.adzone = 467
-        self.appkey="https://display.adhudong.com/site_login_ijf.htm?app_key=adhu48787abbd74d4808"
+
+
 
     def get_actId(self):
         '''

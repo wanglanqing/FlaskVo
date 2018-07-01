@@ -175,16 +175,8 @@ def TestCase():
 @app.route('/Api_index/')
 def api_index():
     at = Api()
-    #定义一份子系统
-    sub_system_list = ['hdt_demand','hdt_admin','hdt_displaynode','egou','yiqigou']
-    #存储summary表格的数据
-    finished_count = {}
-    for item in sub_system_list:
-        finished= str(at.query_api_stat_summary(item)[0][0])
-        if finished :
-            finished_count[item]=finished
-    # print finished_count
-    return render_template('apiStatic.html', sub_system=finished_count.keys(),finished=finished_count.values())
+    re = at.query_api_stat_summary()
+    return render_template('apiStatic.html',re =re, col_len = len(re[0]))
 
 @app.route('/Api_index/<sub_system>/')
 def sub_system(sub_system):
