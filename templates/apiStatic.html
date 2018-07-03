@@ -6,7 +6,7 @@
     <title></title>
 </head>
 <body>
-    <h2>API概述信息</h2>
+    <li>API概述信息</li>
     <table border="1">
         <thead>
         <td>子系统</td>
@@ -20,7 +20,7 @@
         <tr>
 {#            <td><a href="hdt_demand" target="_blank">hdt_demand</a></td>#}
             {% for i in range(col_len) %}
-                {% if i == 0 %}
+                {% if i == 0 and row[i] != '总计'%}
                     <td><a href="{{ row[i] }}" target="_blank">{{ row[i] }}</a></td>
                 {% else %}
                     <td>{{ row[i] }}</td>
@@ -55,7 +55,7 @@
         </tbody>
 
     </table>
-    <a href="testCase" target="_blank"><h2>API信息维护</h2></a>
-    <a href="#" target="_blank"><h2>API执行</h2></a>
+    <a href="testCase" target="_blank"><li>API信息维护</li></a>
+    <a href="#" target="_blank"><li>API执行</li></a>
 </body>
 </html>

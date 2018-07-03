@@ -156,19 +156,26 @@ def act_template():
 @app.route('/Api_index/testCase/', methods=('POST','GET'))
 def TestCase():
     form = TestCaseForm()
-    db = DbOperations()
+    at = Api()
     if form.is_submitted():
         sql_data = form.data
         sql_data.pop('csrf_token')
         sql_data.pop('submit')
         keys = tuple(sql_data.keys())
         values_list = json.dumps(sql_data.values(), encoding='utf-8', ensure_ascii=False)
-        sql = r"INSERT INTO test.testcase_adv {} VALUES ".format(keys).replace("'","`")
-        sql = sql + "("  + values_list[1:-1] +")"
-        print sql
-        db.execute_sql(sql)
-        db.mycommit()
-        return render_template('testCase.html',  form = form, name = ' '.join(sql_data))
+        re=at.insert_case(values_list,keys)
+        # sql = r"INSERT INTO test.testcase_adv {} VALUES ".format(keys).replace("'","`")
+        # sql = sql + "("  + values_list[1:-1] +")"
+        # print sql
+        # db.execute_sql(sql)
+        # db.mycommit()
+        if re != 0:
+            print 'sussssssss'
+            msg = '添加成功'
+        else:
+            print 'failllllllllll'
+            msg = '添加失败'
+        return render_template('testCase.html',  form = form, msg=msg)
     return render_template('testCase.html', form = form)
 
 
@@ -188,5 +195,5 @@ def sub_system(sub_system):
 
 
 if __name__ == '__main__':
-    # app.config['JSON_AS_ASCII'] = False
+    # app.configs['JSON_AS_ASCII'] = False
     app.run( host="0.0.0.0", port=9000, debug=True)
