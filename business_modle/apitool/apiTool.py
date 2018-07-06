@@ -19,8 +19,6 @@ class Api(object):
         sql = r"INSERT INTO test.testcase_adv {} VALUES ".format(keys).replace("'","`")
         sql = sql + "("  + values_list[1:-1] +")"
         rowcount = self.db.exe_insert_sql(sql)
-        print '+++++++++++++++++'
-        print rowcount
         return rowcount
 
     def update_case(self):
@@ -46,16 +44,20 @@ class Api(object):
         re = []
         tid_re =0
         tss_re = 0
+        tcs_re = 0
         for id, sub_system in sub_systems.items():
             id_sql = r"select count(*) from doc.doc_api_method a where a.MENU_ID ={} and a.STATUS=1;".format(id)
-            ss_sql =r"select count(*) from test.testcase_adv a where `group`='{}' and apiState=1;".format(sub_system)
+            ss_sql =r"select count(DISTINCT(apiname)) from test.testcase_adv a where `group`='{}' and apiState=1;".format(sub_system)
+            cs_sql = r"select count(*) from test.testcase_adv a where `group`='{}' and apiState=1;".format(sub_system)
             id_re = self.doc_db.execute_sql(id_sql)[0][0]
             ss_re = self.db.execute_sql(ss_sql)[0][0]
-            tid_re = id_re+ tid_re
+            cs_re = self.db.execute_sql(cs_sql)[0][0]
+            tid_re = id_re + tid_re
             tss_re = ss_re + tss_re
-            re_tmp=[sub_system, id_re, ss_re, format(float(ss_re)/float(id_re), '.2%')]
+            tcs_re = cs_re + tcs_re
+            re_tmp=[sub_system, id_re, ss_re,cs_re, format(float(ss_re)/float(id_re), '.2%')]
             re.append(re_tmp)
-        re.append(['总计',tid_re,tss_re,format(float(tss_re)/float(tid_re),'.2%')])
+        re.append([u'总计', tid_re, tss_re, tcs_re, format(float(tss_re)/float(tid_re),'.2%')])
         return re
 
     def __del__(self):

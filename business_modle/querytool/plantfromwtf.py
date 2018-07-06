@@ -31,4 +31,4 @@ class TestCaseForm(Form):
     actresult = IntegerField(u'actresult',render_kw={'placeholder':u'http状态码 e.g 200 302'})
     expect_value=StringField('expect_value')
     remarks=StringField('remarks')
-    submit = SubmitField(u'testcase')
+    submit = SubmitField(u'提交保存')

@@ -5,6 +5,17 @@
     <meta charset="UTF-8">
     <title>ApiTestCase</title>
     <link rel="stylesheet" href="../static/css/adhd.css" type="text/css">
+    <script type="application/javascript">
+{#        function display_alter(){#}
+{#            alert({{ msg }})#}
+{#        }#}
+{#        alert('ssssssssssssssssssssssss')#}
+        var msg = "{{ msg|safe }}"
+        console.log(msg)
+        if (msg){
+            alert(msg)
+        }
+    </script>
 </head>
 <body>
     {% block main %}
@@ -30,8 +41,6 @@
         </table>
         {{ form.submit }}
     </form>
-    <p>{{ msg }}</p>
-        <p>{{ tigat }}</p>
 {% endblock %}
 </body>
 </html>
