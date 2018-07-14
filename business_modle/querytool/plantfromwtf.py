@@ -54,5 +54,5 @@ class VersionTrackerForm(Form):
     v_desc = TextAreaField(u'v_desc',render_kw={'placeholder':u'上线内容描述'})
     tester = StringField(u'tester', render_kw={'placeholder': u'测试人姓名'})  # 是否需要配置
     remark = TextAreaField(u'remark', render_kw={'placeholder': u'备注信息'})
-    send_email = RadioField(u'是否发送邮件通知sys', choices=[('1', u'是'), ('0', u'否')])
+    send_email = RadioField(u'是否发送邮件通知sys', choices=[('1', u'是'), ('0', u'否')],default=0)
     submit = SubmitField(u'提交保存')

@@ -198,7 +198,7 @@ def version_maintain():
     # vt = VersionTrackerForm()
     # re = at.query_api_stat_summary()
     form = VersionTrackerForm()
-    return render_template('version_maintain.html',form = form)
+    return render_template('VersionTracker/version_maintain.html',form = form)
 
 
 if __name__ == '__main__':
