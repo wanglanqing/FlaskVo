@@ -1,3 +1,4 @@
+{% extends "base.html"%}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,6 +6,7 @@
     <title>{{ title }}</title>
 </head>
 <body>
+    {% block main %}
     <p>hi</p>
 {#    <p>{{ static_data }}</p>#}
     <table border="1">
@@ -30,6 +32,6 @@
 
     </table>
 
-
+    {% endblock %}
 </body>
 </html>

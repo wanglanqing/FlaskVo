@@ -6,7 +6,7 @@ from create_template import *
 from myException import *
 from confparas import *
 from get_act import *
-from FlaskVv.business_modle.querytool.plantfromwtf import TestCaseForm
+from FlaskVv.business_modle.querytool.plantfromwtf import TestCaseForm,VersionTrackerForm
 from FlaskVv.hdt_tools.utils.db_info import *
 from hdt_tools.utils.db_info import *
 # from business_modle.querytool import bidding_analysis as ba
@@ -192,6 +192,13 @@ def sub_system(sub_system):
     at = Api()
     static_data = at.query_api_stat_detail(sub_system)
     return render_template('sub_system_static.html',title = title, static_data = static_data, static_count = len(static_data) )
+
+@app.route('/version_maintain/')
+def version_maintain():
+    # vt = VersionTrackerForm()
+    # re = at.query_api_stat_summary()
+    form = VersionTrackerForm()
+    return render_template('version_maintain.html',form = form)
 
 
 if __name__ == '__main__':

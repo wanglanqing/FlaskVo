@@ -1,4 +1,4 @@
-{#{% extends "base.html"%}#}
+{% extends "base.html"%}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,8 +6,9 @@
     <title></title>
 </head>
 <body>
+    {% block main %}
     <li>API概述信息</li>
-    <table border="1">
+    <table border="2">
         <thead>
         <td>子系统</td>
         <td>接口数量</td>
@@ -56,7 +57,10 @@
         </tbody>
 
     </table>
+    <br>
     <a href="testCase" target="_blank"><li>API信息维护</li></a>
+    <br>
     <a href="#" target="_blank"><li>API执行</li></a>
+    {% endblock %}
 </body>
 </html>
