@@ -5,13 +5,13 @@
     <meta charset="UTF-8">
     <title>VersionTracker</title>
     <link rel="stylesheet" href="../../static/css/adhd.css" type="text/css">
-{#    <script type="application/javascript">#}
-{#        var msg = "{{ msg|safe }}"#}
-{#        console.log(msg)#}
-{#        if (msg){#}
-{#            alert(msg)#}
-{#        }#}
-{#    </script>#}
+    <script type="application/javascript">
+        var msg = "{{ msg|safe }}"
+        console.log(msg)
+        if (msg){
+            alert(msg)
+        }
+        </script>
 </head>
 <body>
 {#    {% block main %}#}
@@ -32,7 +32,7 @@
             {{ render_field(form.tester) }}
             {{ render_field(form.remark) }}
             {{ render_field(form.send_email) }}
-            {{ render_field(form.submit) }}
+{#            {{ render_field(form.submit) }}#}
         </table>
         {{ form.submit }}
     </form>

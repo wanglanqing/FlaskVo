@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2018/7/10 21:33
 # @Author  : wanglanqing
+import datetime
 from FlaskVv.hdt_tools.utils.db_info import *
+from flask_mail import Message,Mail
 from FlaskVv.config import sqls
 
 
@@ -23,9 +25,12 @@ class VersionTracker(object):
         re = self.db.execute_sql(sql)
         return re
 
+    def get_date(self):
+        return datetime.date.today()
+
     # 增加用例
     def insert_version(self, values_list, keys):
-        sql = r"INSERT INTO test.testcase_adv {} VALUES ".format(keys).replace("'", "`")
+        sql = r"INSERT INTO test.version_tracker {} VALUES ".format(keys).replace("'", "`")
         sql = sql + "(" + values_list[1:-1] + ")"
         rowcount = self.db.exe_insert_sql(sql)
         return rowcount
@@ -64,3 +69,14 @@ class VersionTracker(object):
 
     def __del__(self):
         pass
+
+    def send_mail(self):
+        mail = Mail()
+        msg = Message(subject='test send mail',sender='wanglanqing@emar.com',recipients=['wanglanqing@emar.com'])
+        msg.body = 'send by testr'
+        msg.html = '<p>中文对么？</p>'
+
+
+if __name__=='__main__':
+    vt = VersionTracker()
+    print vt.get_date()

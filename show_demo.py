@@ -11,12 +11,21 @@ from FlaskVv.hdt_tools.utils.db_info import *
 from hdt_tools.utils.db_info import *
 # from business_modle.querytool import bidding_analysis as ba
 from FlaskVv.business_modle.apitool.apiTool import *
+from FlaskVv.business_modle.VersionTracker.VersionTracker import VersionTracker
+from flask_mail import Message,Mail
 
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 app = Flask(__name__)
 app.config.from_object('config')
+app.config['MAIL_DEBUG'] = True
+app.config['MAIL_SUPPRESS_SEND'] = False
+app.config['MAIL_SERVER'] = 'smtp.emar.com'
+app.config['MAIL_PORT'] = 25
+app.config['MAIL_USERNAME'] = 'wanglanqing@emar.com'
+app.config['MAIL_PASSWORD'] = 'EBGwlq1'
+mail = Mail(app)
 global env_dict
 env_dict={u'测试环境':True,u'生产环境':False}
 @app.route('/')
@@ -193,14 +202,34 @@ def sub_system(sub_system):
     static_data = at.query_api_stat_detail(sub_system)
     return render_template('sub_system_static.html',title = title, static_data = static_data, static_count = len(static_data) )
 
-@app.route('/version_maintain/')
+@app.route('/version_maintain/',methods=('POST','GET'))
 def version_maintain():
-    # vt = VersionTrackerForm()
-    # re = at.query_api_stat_summary()
+    # mail = Mail(app)
     form = VersionTrackerForm()
+    vt = VersionTracker()
+    if form.is_submitted():
+        sql_data = form.data
+        sql_data.pop('csrf_token')
+        sql_data.pop('submit')
+        keys = tuple(sql_data.keys())
+        values_list = json.dumps(sql_data.values(), encoding='utf-8', ensure_ascii=False)
+        re = vt.insert_version(values_list,keys)
+        if re != 0:
+            msg = '添加成功'
+        else:
+            msg = '添加失败'
+        return render_template('VersionTracker/version_maintain.html', form=form, msg=msg)
+    msg = Message(subject='test send mail', sender='wanglanqing@emar.com', recipients=['wanglanqing@emar.com'])
+    msg.body = 'send by testr'
+    msg.html = '<p>中文对么？</p>'
+    print '****************************'
+    mail.send(msg)
+
     return render_template('VersionTracker/version_maintain.html',form = form)
 
 
 if __name__ == '__main__':
     # app.configs['JSON_AS_ASCII'] = False
     app.run( host="0.0.0.0", port=9000, debug=True)
+
+
