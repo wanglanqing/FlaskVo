@@ -13,6 +13,8 @@ from hdt_tools.utils.db_info import *
 from FlaskVv.business_modle.apitool.apiTool import *
 from FlaskVv.business_modle.VersionTracker.VersionTracker import VersionTracker
 from flask_mail import Message,Mail
+from FlaskVv.utils.Emar_SendMail_Attachments import *
+from FlaskVv.config import mail_template,sqls
 
 import sys
 reload(sys)
@@ -213,17 +215,23 @@ def version_maintain():
         sql_data.pop('submit')
         keys = tuple(sql_data.keys())
         values_list = json.dumps(sql_data.values(), encoding='utf-8', ensure_ascii=False)
-        re = vt.insert_version(values_list,keys)
+        re = vt.insert_version(values_list, keys)
         if re != 0:
             msg = '添加成功'
+            if form.data['send_email'] != 0:
+                applicant = vt.get_user_ch_name(sqls['ch_name']+form.data['applicant'])[0]
+                approver = vt.get_user_ch_name(sqls['ch_name']+form.data['approver'])[0]
+                sender = vt.get_user_ch_name(sqls['ch_name'] + form.data['tester'])[1]
+                send_email(mail_template['normal'], form.data, applicant, approver,sender)
         else:
             msg = '添加失败'
+
         return render_template('VersionTracker/version_maintain.html', form=form, msg=msg)
-    msg = Message(subject='test send mail', sender='wanglanqing@emar.com', recipients=['wanglanqing@emar.com'])
-    msg.body = 'send by testr'
-    msg.html = '<p>中文对么？</p>'
-    print '****************************'
-    mail.send(msg)
+    # msg = Message(subject='test send mail', sender='wanglanqing@emar.com', recipients=['wanglanqing@emar.com'])
+    # msg.body = 'send by testr'
+    # msg.html = '<p>中文对么？</p>'
+    # print '****************************'
+    # mail.send(msg)
 
     return render_template('VersionTracker/version_maintain.html',form = form)
 

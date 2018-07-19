@@ -16,6 +16,9 @@ class VersionTracker(object):
         re = self.db.execute_sql(sql)
         return re
         pass
+    def get_user_ch_name(self,sql):
+        re = self.db.execute_sql(sql)[0]
+        return re
 
     def get_group_info(self, sql):
         re = self.db.execute_sql(sql)
@@ -70,11 +73,11 @@ class VersionTracker(object):
     def __del__(self):
         pass
 
-    def send_mail(self):
-        mail = Mail()
-        msg = Message(subject='test send mail',sender='wanglanqing@emar.com',recipients=['wanglanqing@emar.com'])
-        msg.body = 'send by testr'
-        msg.html = '<p>中文对么？</p>'
+    # def send_mail(self):
+    #     mail = Mail()
+    #     msg = Message(subject='test send mail',sender='wanglanqing@emar.com',recipients=['wanglanqing@emar.com'])
+    #     msg.body = 'send by testr'
+    #     msg.html = '<p>中文对么？</p>'
 
 
 if __name__=='__main__':
