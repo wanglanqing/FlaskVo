@@ -57,7 +57,7 @@ class VersionTrackerForm(Form):
     apply_date = StringField(u'apply_date',validators=[DataRequired()], default=vt.get_date()) #默认为当天时间
     ol_date = StringField(u'ol_date',validators=[DataRequired()], default=vt.get_date()) #, validators=[DataRequired()]
     version = StringField(u'version', validators=[DataRequired(message=u'请输入版本号'), Regexp('[0-9]')], render_kw={'placeholder': u'项目版本号信息','pattern':'[0-9A-Za-z]*'})  # 是否需要配置,Regexp()
-    v_tag = StringField(u'tag', render_kw={'placeholder': u'项目版本tag信息','style':' width="30px"'})  # 是否需要配置
+    v_tag = StringField(u'tag', render_kw={'placeholder': u'项目版本tag信息','style':"height: 20px"})  # 是否需要配置
     v_desc = TextAreaField(u'v_desc',render_kw={'placeholder':u'上线内容描述'})
     tester = SelectField(u'tester', render_kw={'placeholder': u'测试人姓名'}, choices=tester_choices)  # 是否需要配置
     remark = TextAreaField(u'remark', render_kw={'placeholder': u'备注信息'})

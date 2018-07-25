@@ -16,9 +16,9 @@
 <body>
 {#    {% block main %}#}
     {% from "_field.html" import render_field %}
-{#    <p hidden="hidden">#}
+    <p hidden="hidden" style="height: 20px">
     <form action="{{url_for ('version_maintain')}}" method="post">
-        <table width="">
+        <table>
             {{ render_field(form.group) }}
             {{ render_field(form.job_name) }}
             {{ render_field(form.applicant) }}

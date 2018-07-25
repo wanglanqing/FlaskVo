@@ -47,7 +47,7 @@ def get_ad_simulation_info(adzoneId, adOrderId,checkedList,env_value='T'):
                         re = response[i]
                         chk_dict = {'adOrderID': re['adOrder']['id'], 'adOrderName': re['adOrder']['name'],
                                     'adCreativeID': re['adCreative']['id'], 'adCreativeName': re['adCreative']['name'],
-                                    'advertiserId': re['adCreative']['advertiserId'], 'ctr': re['ctr']}
+                                    'advertiserId': re['adCreative']['advertiserId'], 'tag':re['adOrder']['tag'], 'ctr': re['ctr']}
                         tmp_list = []
                         # 筛选勾选项的内容
                         for chk in checkedList:
