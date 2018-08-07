@@ -19,9 +19,24 @@
     <p hidden="hidden" style="height: 20px">
     <form action="{{url_for ('version_maintain')}}" method="post">
         <table>
-            {{ render_field(form.group) }}
-            {{ render_field(form.job_name) }}
-            {{ render_field(form.applicant) }}
+{#            {{ render_field(form.group) }}#}
+{#            {{ render_field(form.job_name) }}#}
+{#            {{ render_field(form.applicant) }}#}
+{#            {{ render_field(form.approver) }}#}
+{#            {{ render_field(form.ol_type) }}#}
+{#            {{ render_field(form.apply_date) }}#}
+{#            {{ render_field(form.ol_date) }}#}
+{#            {{ render_field(form.version) }}#}
+{#            {{ render_field(form.v_tag) }}#}
+{#            {{ render_field(form.v_desc) }}#}
+{#            {{ render_field(form.tester) }}#}
+{#            {{ render_field(form.remark) }}#}
+{#            {{ render_field(form.send_email) }}#}
+{#            {{ render_field(form.submit) }}#}
+
+            {{ render_field(form.group_id) }}
+            {{ render_field(form.job_id) }}
+            {{ render_field(form.applicant_id) }}
             {{ render_field(form.approver) }}
             {{ render_field(form.ol_type) }}
             {{ render_field(form.apply_date) }}
@@ -32,7 +47,6 @@
             {{ render_field(form.tester) }}
             {{ render_field(form.remark) }}
             {{ render_field(form.send_email) }}
-{#            {{ render_field(form.submit) }}#}
         </table>
         {{ form.submit }}
     </form>

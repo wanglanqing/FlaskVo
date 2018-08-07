@@ -211,18 +211,27 @@ def version_maintain():
     vt = VersionTracker()
     if form.is_submitted():
         sql_data = form.data
+        print sql_data
         sql_data.pop('csrf_token')
         sql_data.pop('submit')
+        #处理多个tester_id的情况
+        tester = json.dumps(sql_data['tester'], encoding='utf-8', ensure_ascii=False)[1:-1].replace("\"", "")
+        #使用update将字典tester的值为ids，如2,4,3
+        sql_data.update(tester=tester)
+        # tester_name = json.dumps(vt.get_user_ch_name(sqls['ch_name'].format(tester_ids)), encoding='utf-8', ensure_ascii=False)
         keys = tuple(sql_data.keys())
         values_list = json.dumps(sql_data.values(), encoding='utf-8', ensure_ascii=False)
         re = vt.insert_version(values_list, keys)
         if re != 0:
             msg = '添加成功'
             if form.data['send_email'] != 0:
-                applicant = vt.get_user_ch_name(sqls['ch_name']+form.data['applicant'])[0]
-                approver = vt.get_user_ch_name(sqls['ch_name']+form.data['approver'])[0]
-                sender = vt.get_user_ch_name(sqls['ch_name'] + form.data['tester'])[1]
-                send_email(mail_template['normal'], form.data, applicant, approver,sender)
+                #拼装邮件内容申请者姓名、审批者姓名和邮件发送者的拼音、jobname信息
+                applicant = vt.get_user_ch_name(sqls['ch_name'].format(form.data['applicant_id']))[0][0]
+                approver = vt.get_user_ch_name(sqls['ch_name'].format(form.data['approver']))[0][0]
+                sender = vt.get_user_ch_name(sqls['ch_name'].format(tester))[0][1]
+                job_name = vt.get_jenkins_job(sqls['jenkins_job'].format(form.data['job_id']))[0][1]
+                print job_name
+                send_email(mail_template['normal'], form.data, applicant, approver,sender,job_name)
         else:
             msg = '添加失败'
 

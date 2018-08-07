@@ -9,12 +9,12 @@ import email.MIMEBase
 import email.MIMEImage
 
 
-def send_email(template_type, data, applicant, approver, sender, recipients=['ebg-tech-test','wanglanqing']):
+def send_email(template_type, data, applicant, approver, sender, job_name,recipients=['ebg-tech-test','wanglanqing']):
 
     suffix = '@emar.com'
     sender = sender + suffix
     recipients = [recipient + suffix for recipient in recipients]
-    job_name = '-'.join(data['v_tag'].split('-')[0:2])
+    # job_name = '-'.join(data['v_tag'].split('-')[0:2])
     mailSubject = job_name + '--' + data['apply_date'] + '--申请上线'
     mailText = template_type % (job_name, job_name, applicant, approver, data['apply_date'], data['ol_date'], data['version'], data['v_tag'],data['v_desc'])
     server = smtplib.SMTP("mail.emar.com")

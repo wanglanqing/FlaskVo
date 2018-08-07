@@ -17,7 +17,7 @@ class VersionTracker(object):
         return re
         pass
     def get_user_ch_name(self,sql):
-        re = self.db.execute_sql(sql)[0]
+        re = self.db.execute_sql(sql)
         return re
 
     def get_group_info(self, sql):
@@ -33,7 +33,8 @@ class VersionTracker(object):
 
     # 增加用例
     def insert_version(self, values_list, keys):
-        sql = r"INSERT INTO test.version_tracker {} VALUES ".format(keys).replace("'", "`")
+        # sql = r"INSERT INTO test.version_tracker {} VALUES ".format(keys).replace("'", "`")
+        sql = r"INSERT INTO test.test_version_tracker {} VALUES ".format(keys).replace("'", "`")
         sql = sql + "(" + values_list[1:-1] + ")"
         rowcount = self.db.exe_insert_sql(sql)
         return rowcount
