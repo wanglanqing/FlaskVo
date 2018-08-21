@@ -6,7 +6,7 @@ from wtforms import StringField, SelectField, IntegerField, TextAreaField, Submi
 from wtforms.validators import DataRequired, Length, Email, EqualTo, NumberRange,Regexp
 from FlaskVv.config import sub_systems,sqls
 from FlaskVv.business_modle.VersionTracker.VersionTracker import VersionTracker
-
+import datetime
 
 class MyForm(Form):
     adzoneClickid = StringField('adzoneClickid', validators=[Length(min=4, max=25)])
@@ -91,3 +91,27 @@ class VersionTrackerForm(Form):
     remark = TextAreaField(u'remark', render_kw={'placeholder': u'备注信息'})
     send_email = RadioField(u'是否发送邮件', choices=[('1', u'是'), ('0', u'否')], default=1)
     submit = SubmitField(u'提交保存')
+
+
+class Mylaunchlist(Form):
+    group_choices=VersionTrackerForm.group_choices
+    tester_choices = VersionTrackerForm.tester_choices
+    tester_choices.insert(0, (0, 'all'))
+
+    def current_month(self):
+        return int(datetime.datetime.now().month)
+
+    def defaultyear(self):
+        return int(datetime.datetime.now().year)
+    #增加获取当前年和月
+    current_year= int(datetime.datetime.now().year)
+    current_month=int(datetime.datetime.now().month)
+    myyear = SelectField(u'年', validators=[DataRequired()], choices=[(2018, 2018), (2019, 2019), (2010, 2010), ],
+                         default=current_year)
+    mymonth = SelectField(u'月', validators=[DataRequired()],
+                          choices=[(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8), (9, 9), (10, 10),
+                                   (11, 11), (12, 12)], default=current_month)
+    #增加两个查询条件
+    groups = SelectField(u'业务组', validators=[DataRequired()], choices=group_choices, default=1)
+    testers = SelectField(u'tester', choices=tester_choices,default=0)
+    submit = SubmitField(u'查  找')

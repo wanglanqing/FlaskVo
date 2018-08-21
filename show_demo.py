@@ -6,7 +6,7 @@ from create_template import *
 from myException import *
 from confparas import *
 from get_act import *
-from FlaskVv.business_modle.querytool.plantfromwtf import TestCaseForm,VersionTrackerForm
+from FlaskVv.business_modle.querytool.plantfromwtf import *
 from FlaskVv.hdt_tools.utils.db_info import *
 from hdt_tools.utils.db_info import *
 # from business_modle.querytool import bidding_analysis as ba
@@ -15,6 +15,8 @@ from FlaskVv.business_modle.VersionTracker.VersionTracker import VersionTracker
 from flask_mail import Message,Mail
 from FlaskVv.utils.Emar_SendMail_Attachments import *
 from FlaskVv.config import mail_template,sqls
+from business_modle.launch import launchlistdb as lc
+from business_modle.querytool import plantfromwtf as ft
 
 import sys
 reload(sys)
@@ -26,7 +28,7 @@ app.config['MAIL_SUPPRESS_SEND'] = False
 app.config['MAIL_SERVER'] = 'smtp.emar.com'
 app.config['MAIL_PORT'] = 25
 app.config['MAIL_USERNAME'] = 'wanglanqing@emar.com'
-app.config['MAIL_PASSWORD'] = 'EBGwlq1'
+app.config['MAIL_PASSWORD'] = ''
 mail = Mail(app)
 global env_dict
 env_dict={u'测试环境':True,u'生产环境':False}
@@ -243,6 +245,27 @@ def version_maintain():
     # mail.send(msg)
 
     return render_template('VersionTracker/version_maintain.html',form = form)
+
+@app.route('/launchlist/',methods=['GET','POST'])
+def launchlist():
+    form=ft.Mylaunchlist()
+    x=form.myyear
+    if form.is_submitted():
+        year=form.myyear.data
+        month=form.mymonth.data
+        #增加两个字段
+        group_id = form.groups.data
+        tester_id = form.testers.data
+        print month,year
+        reslut=lc.getlanuchlist(int(year),int(month),int(group_id),int(tester_id))
+        if len(reslut)>0:
+            lc.exportXls(reslut)
+        return render_template('launchlist.html',form=form,result=reslut)
+    else:
+        return render_template('launchlist.html',form=form,result='')
+
+# @app.route('/export/',methods=['post','get'])
+# def exportXls():
 
 
 if __name__ == '__main__':
