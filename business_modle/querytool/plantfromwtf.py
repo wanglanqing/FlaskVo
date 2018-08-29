@@ -84,10 +84,10 @@ class VersionTrackerForm(Form):
     ol_date = StringField(u'ol_date', validators=[DataRequired()],
                           default=vt.get_date())  # , validators=[DataRequired()]
     version = StringField(u'version', validators=[DataRequired(message=u'请输入版本号')],
-                          render_kw={'placeholder': u'项目版本号信息', 'pattern': '[0-9A-Za-z]*'})  # 是否需要配置,Regexp()
-    v_tag = StringField(u'tag', render_kw={'placeholder': u'项目版本tag信息', 'style': "height: 20px"})  # 是否需要配置
+                          render_kw={'placeholder': u'项目版本号信息', 'pattern': '[0-9A-Za-z.]*'})  # 是否需要配置,Regexp()
+    v_tag = StringField(u'tag', render_kw={'placeholder': u'项目版本tag信息'})
     v_desc = TextAreaField(u'v_desc', render_kw={'placeholder': u'上线内容描述'})
-    tester = SelectMultipleField(u'tester', render_kw={'placeholder': u'测试人姓名'}, choices=tester_choices)  # 是否需要配置
+    tester = SelectMultipleField(u'tester', render_kw={'placeholder': u'测试人姓名','style':"height:145px"}, choices=tester_choices)  # 是否需要配置
     remark = TextAreaField(u'remark', render_kw={'placeholder': u'备注信息'})
     send_email = RadioField(u'是否发送邮件', choices=[('1', u'是'), ('0', u'否')], default=1)
     submit = SubmitField(u'提交保存')
@@ -95,8 +95,9 @@ class VersionTrackerForm(Form):
 
 class Mylaunchlist(Form):
     group_choices=VersionTrackerForm.group_choices
-    tester_choices = VersionTrackerForm.tester_choices
-    tester_choices.insert(0, (0, 'all'))
+    #copy tester_choices
+    tester_list = VersionTrackerForm.tester_choices[:]
+    tester_list.insert(0, ('ALL', 'all'))
 
     def current_month(self):
         return int(datetime.datetime.now().month)
@@ -113,5 +114,5 @@ class Mylaunchlist(Form):
                                    (11, 11), (12, 12)], default=current_month)
     #增加两个查询条件
     groups = SelectField(u'业务组', validators=[DataRequired()], choices=group_choices, default=1)
-    testers = SelectField(u'tester', choices=tester_choices,default=0)
+    testers = SelectField(u'tester', choices=tester_list,default=0)
     submit = SubmitField(u'查  找')

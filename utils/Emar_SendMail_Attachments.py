@@ -9,7 +9,7 @@ import email.MIMEBase
 import email.MIMEImage
 
 
-def send_email(template_type, data, applicant, approver, sender, job_name,recipients=['ebg-tech-test','wanglanqing']):
+def send_email(template_type, data, applicant, approver, sender, job_name,recipients=['wanglanqing']):
 
     suffix = '@emar.com'
     sender = sender + suffix

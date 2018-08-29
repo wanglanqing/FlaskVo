@@ -1,5 +1,5 @@
 # coding:utf8
-from flask import Flask,jsonify,request,render_template,url_for
+from flask import Flask,jsonify,request,render_template,url_for,flash
 import traceback
 from get_act import *
 from create_template import *
@@ -216,34 +216,34 @@ def version_maintain():
         print sql_data
         sql_data.pop('csrf_token')
         sql_data.pop('submit')
-        #处理多个tester_id的情况
-        tester = json.dumps(sql_data['tester'], encoding='utf-8', ensure_ascii=False)[1:-1].replace("\"", "")
-        #使用update将字典tester的值为ids，如2,4,3
+        #处理多个tester_id的情况,将ids处理为1,2,3的形式
+        tester = json.dumps(sql_data['tester'], encoding='utf-8', ensure_ascii=False)[1:-1].replace("\"", "").replace(" ","")
+        # tester = json.dumps(sql_data['tester'], encoding='utf-8', ensure_ascii=False)[1:-1]
+        print str(tester).split()
+        #使用update将字典tester的值更新
         sql_data.update(tester=tester)
-        # tester_name = json.dumps(vt.get_user_ch_name(sqls['ch_name'].format(tester_ids)), encoding='utf-8', ensure_ascii=False)
         keys = tuple(sql_data.keys())
         values_list = json.dumps(sql_data.values(), encoding='utf-8', ensure_ascii=False)
         re = vt.insert_version(values_list, keys)
         if re != 0:
             msg = '添加成功'
-            if form.data['send_email'] != 0:
+            if int(form.data['send_email']) != 0:
                 #拼装邮件内容申请者姓名、审批者姓名和邮件发送者的拼音、jobname信息
-                applicant = vt.get_user_ch_name(sqls['ch_name'].format(form.data['applicant_id']))[0][0]
-                approver = vt.get_user_ch_name(sqls['ch_name'].format(form.data['approver']))[0][0]
-                sender = vt.get_user_ch_name(sqls['ch_name'].format(tester))[0][1]
-                job_name = vt.get_jenkins_job(sqls['jenkins_job'].format(form.data['job_id']))[0][1]
-                print job_name
+
+                applicant = vt.get_user_ch_name(sqls['applicant_ch_name'].format(form.data['applicant_id']))[0][0]
+                approver = vt.get_user_ch_name(sqls['applicant_ch_name'].format(form.data['approver']))[0][0]
+                sender = vt.get_user_ch_name(sqls['ch_name'].format(tester[1]))[0][1]
+
+                job_name = vt.get_jenkins_job(sqls['jenkins_name'].format(form.data['job_id']))[0][0]
+                print job_name,sender,approver,applicant
                 send_email(mail_template['normal'], form.data, applicant, approver,sender,job_name)
+                flash("send mail Success")
+            else:
+                flash("send mail Success")
         else:
             msg = '添加失败'
-
+            flash("send mail Fali")
         return render_template('VersionTracker/version_maintain.html', form=form, msg=msg)
-    # msg = Message(subject='test send mail', sender='wanglanqing@emar.com', recipients=['wanglanqing@emar.com'])
-    # msg.body = 'send by testr'
-    # msg.html = '<p>中文对么？</p>'
-    # print '****************************'
-    # mail.send(msg)
-
     return render_template('VersionTracker/version_maintain.html',form = form)
 
 @app.route('/launchlist/',methods=['GET','POST'])
@@ -255,9 +255,9 @@ def launchlist():
         month=form.mymonth.data
         #增加两个字段
         group_id = form.groups.data
-        tester_id = form.testers.data
+        tester_name = form.testers.data
         print month,year
-        reslut=lc.getlanuchlist(int(year),int(month),int(group_id),int(tester_id))
+        reslut=lc.getlanuchlist(int(year),int(month),int(group_id),tester_name)
         if len(reslut)>0:
             lc.exportXls(reslut)
         return render_template('launchlist.html',form=form,result=reslut)
