@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<script>
+    var t1='',t2='';
+    var data=[
+        {fromName:"上海",toName:"北京",coords:[[121.4648,31.2891],[116.4551,40.2539]]},
+        {fromName:"南京",toName:"北京",coords:[[118.8062,31.9208],[116.4551,40.2539]]},
+        {fromName:"宁波",toName:"北京",coords:[[121.5967,29.6466],[116.4551,40.2539]]},
+        {fromName:"成都",toName:"北京",coords:[[103.9526,30.7617],[116.4551,40.2539]]},
+        {fromName:"呼和浩特",toName:"北京",coords:[[111.4124,40.4901],[116.4551,40.2539]]},
+        {fromName:"乌鲁木齐",toName:"北京",coords:[[87.9236,43.5883],[116.4551,40.2539]]},
+        {fromName:"昆明",toName:"北京",coords:[[102.9199,25.4663],[116.4551,40.2539]]}
+        ];
+
+    console.log(data);
+    var fdada=[];
+    setTimeout(function(){
+        for(var i=0;i<data.length;i++){
+            t1=data[i].fromName;
+            data[i].fromName=data[i].toName;
+            data[i].toName=t1;
+            fdada.push(data[i].toName,data[i].fromName,)
+            //console.log(data[i])
+            t2=data[i].coords[0];
+            data[i].coords[0]=data[i].coords[1];
+            data[i].coords[1]=t2;
+        }
+        console.log(fdata);
+    },2000)
+
+
+</script>
+
+</body>
+</html>

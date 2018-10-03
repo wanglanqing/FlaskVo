@@ -1,15 +1,5 @@
 {% extends "base.html"%}
 {% block main %}
-    <script>
-        var submi =document.getElementById("submit")
-        var expBtn=document.getElementById("expBtn")
-        var flag=true
-        submi.onclick=function ch(){
-            if (flag){
-                expBtn.innerHTML
-            }
-        }
-    </script>
 <div class="container">
 <form action="{{url_for('launchlist')}}" method="post">
     {{form.hidden_tag()}}
@@ -57,9 +47,10 @@
             <tr>
                 {% for i in trcout %}
                     <td>{{i|safe}}</td>
-
                 {% endfor %}
-                <td><a href="#">edit</a></td>
+{#                <td><a href="{{url_for('getlanuch',id=trcout[0]|safe)}}">edit</a></td>#}
+                <td><a href="{{url_for('getlanuch',id=trcout[0]|safe)}}">编辑</a></td>
+                <!--<td><a href="#">edit</a></td>-->
             </tr>
             {% endfor %}
         </tbody>

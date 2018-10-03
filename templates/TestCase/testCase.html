@@ -1,0 +1,35 @@
+{% extends "base.html"%}
+{% block main %}
+  {{ form.hidden_tag() }}
+   <div class="container">
+
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    {% endfor %}
+    {% block page_content %}{% endblock %}
+    </div>
+    {% from "_field.html" import render_field %}
+    <p hidden="hidden" style="height: 20px">
+    <form action="{{url_for ('TestCase')}}" method="post">
+
+        <table>
+            {{ render_field(form.apiName) }}
+            {{ render_field(form.apiState) }}
+            {{ render_field(form.testCaseName) }}
+            {{ render_field(form.group) }}
+            {{ render_field(form.status) }}
+            {{ render_field(form.level) }}
+            {{ render_field(form.param_type) }}
+            {{ render_field(form.methodurl) }}
+{#            {{ render_field(form.param) }}#}
+            {{ render_field(form.actresult) }}
+            {{ render_field(form.expect_value) }}
+            {{ render_field(form.remarks) }}
+        </table>
+        {{ form.submit }}
+    </form>
+    </div>
+{% endblock %}
+{#    {% endblock %}#}

@@ -2,9 +2,8 @@
 # @Time    : 2018/7/10 21:33
 # @Author  : wanglanqing
 import datetime
-from FlaskVv.hdt_tools.utils.db_info import *
-from flask_mail import Message,Mail
-from FlaskVv.config import sqls
+from hdt_tools.utils.db_info import *
+from config import *
 
 
 class VersionTracker(object):
@@ -17,7 +16,7 @@ class VersionTracker(object):
         return re
         pass
     def get_user_ch_name(self,sql):
-        re = self.db.execute_sql(sql)
+        re = self.db.execute_sql(sql)[0]
         return re
 
     def get_group_info(self, sql):
@@ -33,8 +32,8 @@ class VersionTracker(object):
 
     # 增加用例
     def insert_version(self, values_list, keys):
-        # sql = r"INSERT INTO test.version_tracker {} VALUES ".format(keys).replace("'", "`")
-        sql = r"INSERT INTO test.test_version_tracker {} VALUES ".format(keys).replace("'", "`")
+        sql = r"INSERT INTO test.version_tracker {} VALUES ".format(keys).replace("'", "`")
+        # sql = r"INSERT INTO test.test_version_tracker {} VALUES ".format(keys).replace("'", "`")
         sql = sql + "(" + values_list[1:-1] + ")"
         rowcount = self.db.exe_insert_sql(sql)
         return rowcount
@@ -70,6 +69,14 @@ class VersionTracker(object):
             re.append(re_tmp)
         re.append([u'总计', tid_re, tss_re, tcs_re, format(float(tss_re) / float(tid_re), '.2%')])
         return re
+
+    def update_version_desc_state(self,id,status,v_desc):
+        sql = '''update test.version_tracker
+            set v_desc='{}',status={},update_time=now()
+            where id= {}'''.format(v_desc,status,id)
+        # print sql
+        rowcount = self.db.exe_insert_sql(sql)
+        return rowcount
 
     def __del__(self):
         pass

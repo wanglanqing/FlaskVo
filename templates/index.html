@@ -1,3 +1,4 @@
+{% extends "base.html"%}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -11,7 +12,9 @@
             </frameset>
             <noframes>
                 <body>
-                你的浏览器不支持frame
+                {% block main %} 
+                走一个再现江湖！！！！！！！！！！！！
+                {% endblock %}
                 </body>
             </noframes>
 
