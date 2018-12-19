@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 #encoding: utf-8
 #version:2018/07/10,增加接口统计视图函数
 import os
@@ -33,10 +33,18 @@ from business_modle.VersionTracker.VersionTracker import VersionTracker
 from business_modle.testtools.Recharge import *
 from business_modle.testtools.cpa_api import *
 from business_modle.querytool.crm_order import *
+from business_modle.querytool.adjust_ocpa import *
+from business_modle.querytool.ocpa_order import *
 from business_modle.testtools.adinfo_collect import *
+from business_modle.testtools.del_minipragram import *
 from utils.Emar_SendMail_Attachments import *
 from config import mail_template,sqls
 from flask_paginate import Pagination,get_page_parameter
+from business_modle.Crm.CrmOrderEffectCheck import Crm
+from business_modle.querytool.phoneVaildCode import *
+from business_modle.checkRoute.checkRouteForm import *
+from business_modle.checkRoute.checkRoute import checkNodeRoute
+
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))   # refers to application_top
 APP_STATIC_TXT = os.path.join(APP_ROOT, 'txt') #设置一个专门的类似全局变量的东西
@@ -241,7 +249,8 @@ def myredis():
             # return render_template('myredis.html',mybudget=mybudget,allcount=allcount,negativecount=negativecount)
         elif jobid1=='110':
             data='<option selected="selected">缓存中的订单预算：测试</option>'
-            redis_nodes=[{"host":'101.254.242.11',"port":'17001'},{"host":'101.254.242.12',"port":'17001'},{"host":'101.254.242.17',"port":'17001'}]
+            # redis_nodes=[{"host":'172.16.105.11',"port":'17001'},{"host":'172.16.105.12',"port":'17001'},{"host":'172.16.105',"port":'17001'}]
+            redis_nodes=[{"host":'101.254.242.12',"port":'17001'},]
         mybudget,allcount,negativecount=mr.mygetredis(redis_nodes)
         return render_template('myredis.html',mybudget=mybudget,allcount=allcount,negativecount=negativecount,data=data)
 
@@ -255,6 +264,7 @@ def myredis_status():
         # mybudget=''
         if jobid1=='120':
             data='<option selected="selected">缓存中的订单状态：生产</option>'
+            redis_nodes=[{"host":'123.59.17.118',"port":'13601'},{"host":'123.59.17.85',"port":'13601'},{"host":'123.59.17.11',"port":'13601'}]
             # mybudget,allcount,negativecount=mr.mygetredis(redis_nodes)
             # return render_template('myredis.html',mybudget=mybudget,allcount=allcount,negativecount=negativecount)
         elif jobid1=='110':
@@ -291,8 +301,8 @@ def voyagerlog1():
     tmpdit=''
     if form.validate_on_submit():
         zclk=form.data['adzoneClickid']
-        kss = form.data['adzoneClickid']
-        tmpdit=ba.orderbylognew(zclk)
+        env = form.data['myenv']
+        tmpdit=ba.orderbylognew(zclk,str(env))
         return render_template('voyagerlog1.html',form=form,data=tmpdit)
     return render_template('voyagerlog1.html',form=form)
 
@@ -435,20 +445,6 @@ def ad_simulation():
         else:
             return render_template("ad_simulation.html", title=title,emsg='请输入广告位id或勾选关键字')
 
-# @app.route('/baselogin',methods=('POST','GET'))
-# def baselogin():
-#     form=BaseLogin()
-#     #判断是否是验证提交
-#     if form.validate_on_submit():
-#         #跳转
-#         # flash(form.name.data+'|'+form.password.data+'|'+form.begintime.data)
-#         flash(form.name.data+'|'+form.password.data)
-#         # print form.name.data
-#         # print form.password.data
-#         return redirect(url_for('hdtapi'))
-#     else:
-#         #渲染
-#         return render_template('baselogin.html',form=form)
 
 @app.route('/updateAdId/',methods=['POST','GET'])
 def UpdateAdId():
@@ -493,38 +489,63 @@ def login():
             return 'Wrong user!'
     return render_template('logintest.html', form=form)
 
-@app.route('/Api_index/testCase/', methods=('POST','GET'))
-def TestCase():
+#新建，修改测试用例
+@app.route('/Api_index/TestCase/<sub_system>/<any(new,update):page_name>/', methods=('POST','GET'))
+def TestCase(sub_system,page_name):
     form = TestCaseForm()
     at = Api()
-    if form.is_submitted():
+    if page_name=='new' and form.is_submitted():
         sql_data = form.data
         sql_data.pop('csrf_token')
         sql_data.pop('submit')
         url_params = at.split_url(sql_data['methodurl'])
         # print url_params[1]
-        sql_data['methodurl'] = url_params[0]
-        sql_data['param'] = url_params[1]
+        sql_data['methodurl'] = url_params[0].strip()
+        sql_data['param'] = str(url_params[1]).strip()
+        sql_data['group'] = sub_system
         print sql_data
         keys = tuple(sql_data.keys())
         values_list = json.dumps(sql_data.values(), encoding='utf-8', ensure_ascii=False)
-        re=at.insert_case(values_list,keys)
+        re = at.insert_case(values_list, keys)
         if re != 0:
             flash('添加成功')
-            msg = '添加成功'
         else:
             flash('添加失败')
-            msg = '添加失败'
-        return render_template('TestCase/testCase.html',  form = form, msg=msg)
-    return render_template('TestCase/testCase.html', form = form)
+        return render_template('TestCase/testCase.html', form=form, case_detail=None, sub_system=sub_system)
+    elif page_name=='update':
+        if len(request.args) > 0:
+            cid = request.args['id']
+            case_detail = at.query_case_detail(cid)[0]
+            methodurl = at.merge_url_param(str(case_detail['methodurl']), str(case_detail['param']))
+            if form.is_submitted():
+                sql_data = form.data
+                sql_data.pop('csrf_token')
+                sql_data.pop('submit')
+                url_params = at.split_url(sql_data['methodurl'])
+                sql_data['methodurl'] = url_params[0].strip()
+                sql_data['param'] = url_params[1]
+                sql_data['group'] = sub_system.strip()
+                set_value='''apiState= "{}",apiName= "{}",testCaseName= "{}",`status`= "{}",`level` = "{}",param_type = "{}",
+                             methodurl = "{}",param="{}", actresult = "{}", expect_value = "{}", remarks = "{}"
+                             '''.format(sql_data['apiState'],sql_data['apiName'],sql_data['testCaseName'],sql_data['status'],
+                                        sql_data['level'],sql_data['param_type'],sql_data['methodurl'],sql_data['param'],
+                                        sql_data['actresult'],sql_data['expect_value'],sql_data['remarks'])
+                print set_value
+                at.update_case(set_value,cid)
+                case_detail = at.query_case_detail(cid)[0]
+                return render_template('TestCase/testCase.html', form=form, case_detail=case_detail,methodurl=methodurl, sub_system=sub_system)
+            else:
+                return render_template('TestCase/testCase.html', form=form, case_detail=case_detail, methodurl=methodurl,sub_system=sub_system)
+        return render_template('TestCase/testCase.html', form=form, case_detail=None, sub_system=sub_system)
+    return render_template('TestCase/testCase.html', form = form,case_detail=None,sub_system=sub_system)
 
-@app.route('/Api_index/<sub_system>/<any(stat,detail):page_name>/')
-def sub_system(sub_system,page_name):
+@app.route('/Api_index/<sub_system>/<any(stat,detail):page_name>/', methods=['POST','GET'])
+def sub_system(sub_system,page_name): #,id=None):
     title = sub_system
     at = Api()
     if page_name=='stat':
         static_data = at.query_api_stat_detail(sub_system)
-        return render_template('TestCase/sub_system_static.html',title = title, static_data = static_data, static_count = len(static_data) )
+        return render_template('TestCase/sub_system_static.html',title = title, static_data = static_data, static_count = len(static_data),sub_system=sub_system )
     elif page_name=='detail':
         search = False
         pagesize=20
@@ -532,19 +553,20 @@ def sub_system(sub_system,page_name):
         if q:
             search=True
         page = request.args.get(get_page_parameter(),type=int,default=1)
-        print '============'
-        print page,pagesize
-        detail_data = at.query_case_list(sub_system,page,pagesize)
+        print request.method
+        if request.method=='POST':
+            cid = request.form.get('id').strip()
+            detail_data = at.query_case_list(sub_system, page, pagesize,id=cid)
+            print detail_data
+            print cid,'is is is is'
+        else:
+            detail_data = at.query_case_list(sub_system, page, pagesize)
         if isinstance(detail_data[0],list):
             total =detail_data[1]
             pagination=Pagination(page=page,total=total,per_page=pagesize,search=search,record_name='cases')
-            print '*********'
-            print page,total
-            print pagination
-            # return render_template('TestCase/caseList.html', title=title, detail_data=detail_data,detail_count=len(detail_data))
-            return render_template('TestCase/FinalCaseList.html', title=title, detail_data=detail_data[0],pagesize=pagesize, detail_count=detail_data[1],pagination=pagination,)
+            return render_template('TestCase/FinalCaseList.html', title=title, detail_data=detail_data[0],pagesize=pagesize, detail_count=detail_data[1],pagination=pagination,system_name=sub_system)
         elif isinstance(detail_data,str):
-            return render_template('TestCase/FinalCaseList.html', title=title, detail_data=detail_data,)
+            return render_template('TestCase/FinalCaseList.html', title=title, detail_data=detail_data,sub_system=sub_system)
 
 @app.route('/Api_index/')
 def Api_index():
@@ -609,11 +631,13 @@ def version_maintain(page_name):
             return render_template('VersionTracker/version_maintain.html', form=form, msg=msg)
         return render_template('VersionTracker/version_maintain.html',form = form)
     else:
-        print request.form.get('status'),request.form.get('v_desc'),request.form.get('id')
+        print request.form.get('status'),request.form.get('v_desc'),request.form.get('id'),request.form.get('job_name'),request.form.get('tester')
         id = request.form.get('id')
         status = request.form.get('status')
         v_desc = request.form.get('v_desc')
-        re=vt.update_version_desc_state(id,status,v_desc)
+        # job_name = request.form.get('job_name')
+        tester = request.form.get('tester').strip().replace('，',',')
+        re=vt.update_version_desc_state(id,status,v_desc,tester)
         if int(re) != 0:
             flash("update Success")
             result=lc.getlanuch(id)
@@ -722,8 +746,113 @@ def query_result():
 
         return render_template("advertiser_test.html",title=title,url=ad_link,new_url=new_url,paras=paras,ad_click_tag=utm_click)
 
+@app.route('/ocpa_price',methods=['POST','GET'])
+def ocpa_price():
+    title=u'广告主OCPA调价趋势图'
+    if request.method == 'GET':
+
+        return render_template('adjust_ocpa.html',title=title)
+
+    else:
+        env_dict={u'测试环境':True,u'线上环境':False}
+        env=request.form.get('env').strip()
+        ad_order_id = request.form.get('ad_order_id')
+        adzone_id = request.form.get('AdzoneId')
+
+        day=request.form.get('begin_date')
+        beign_time_re=day.replace('-','')
+        oc=adjust_price(day,ad_order_id,env_dict[env],adzone_id=adzone_id)
+        xvalue,dat,dat2,init_price,dat3,dat4=oc.timelist(),oc.adjust_ocpa(),oc.actual_payment(),oc.init_price(),oc.adzone(),oc.shownum()
+        print xvalue,dat,init_price
+        print adzone_id
+        return render_template('adjust_ocpa.html',xvalue=xvalue,title=title,data=dat,data2=dat2,data3=dat3,data4=dat4,init_price=init_price,begintime=day,ad_order_id=ad_order_id,adzone_id=int(adzone_id),env_value='<option selected="selected">'+env+'</option>')
 
 
+@app.route('/ocpa_order',methods=['POST','GET'])
+def ocpa_order():
+    title=u'OCPA订单查询'
+    if request.method == 'GET':
+
+        return render_template('ocpa_order.html',title=title)
+    else:
+        begin_time = request.form.get('begin_date')
+        beign_time_re=begin_time.replace('-','')
+        result_order= Ocpa_order(beign_time_re,env_value=False)
+        paras=result_order.show_result()
+
+        return render_template("ocpa_order.html",title=title,paras=paras,begin_time=beign_time_re,begintime=begin_time)
+
+
+@app.route('/ocpaorder_detail')
+
+def ocpaorder_detail(env=False):
+    title=u'OCPA订单调价趋势图'
+    ad_order_id=request.args.get('ad_order_id')
+    day=request.args.get('date')
+    adzone_id=request.args.get('adzone_id')
+    oc=adjust_price(day,ad_order_id,env,adzone_id=adzone_id)
+
+    xvalue,dat,dat2,init_price,dat3=oc.timelist(),oc.adjust_ocpa(),oc.actual_payment(),oc.init_price(),oc.adzone()
+#    adzone_id=request.form.get('AdzoneId')
+    return render_template('adjust_ocpa.html',xvalue=xvalue,title=title,data=dat,data2=dat2,data3=dat3,init_price=init_price,begintime=day,ad_order_id=ad_order_id,adzone_id=int(adzone_id),env_value=False)
+
+@app.route('/crm/effect_order/',methods=['GET','POST'])
+def effect_order():
+    if request.method=='POST':
+        date = request.form.get('date')
+        ceo=Crm(date)
+        re=ceo.cmp_infos(ceo.check_info())
+        if re['data']:
+            return render_template('Crm/CrmOrderEffectCheck.html',re=re,effect=re['data'][0][0],order=re['data'][1][0])
+        else:
+            return render_template('Crm/CrmOrderEffectCheck.html', re=re)
+    else:
+        return render_template('Crm/CrmOrderEffectCheck.html',re={})
+
+@app.route('/del_minipragram',methods=['POST','GET'])
+def del_minipragram():
+    title=u"删除小程序相关数据"
+    if request.method == 'GET':
+        return render_template('del_minipragram.html',title=title)
+    else:
+        openid = request.form.get('openid')
+
+        del_result= Del_minipragram(openid,env_value=True)
+
+        para=del_result.del_sql()
+        return render_template('del_minipragram.html',openid=openid,para=para)
+
+
+@app.route('/phoneVaildCode/',methods=['get','post'])
+def phoneVaildCode():
+    if request.method=='GET':
+        pp = phoneVaild(env='1')
+        re = pp.get_valid_code()
+        return render_template('phoneVaildCode.html', re=re,pos='1')
+    else:
+        env = request.values.getlist('env')
+        print env[0]
+        pp = phoneVaild(env=env[0])
+        re = pp.get_valid_code()
+        return  render_template('phoneVaildCode.html',re=re,pos=env[0])
+
+@app.route('/checkRoute/',methods=['get','post'])
+def checkRoute():
+    form = checkRouteForm()
+    re = ''
+    if request.method == 'GET':
+        return render_template('checkRoute.html',form = form,re=re)
+    else:
+        datas = form.data
+        env = datas['env'].strip()
+        adzoneLink = datas['adzoneLink'].strip()
+        cr = checkNodeRoute(env,adzoneLink)
+        re = cr.join_url()
+        if isinstance(re,list) and len(re)>0:
+            re_len = len(re)
+            return render_template('checkRoute.html', form=form, re=re, re_type=1,re_len=re_len)
+        else:
+            return render_template('checkRoute.html',form = form,re=re,re_type=0)
 
 
 
