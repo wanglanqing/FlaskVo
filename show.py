@@ -9,7 +9,6 @@ import time
 
 from flask import jsonify
 from flask import Flask,request,render_template,flash
-
 from business_modle.report import hdtmonitor as m
 from business_modle.testtools import hdt_cssc as cssc
 from business_modle.report import reportdata as r
@@ -854,7 +853,34 @@ def checkRoute():
         else:
             return render_template('checkRoute.html',form = form,re=re,re_type=0)
 
-
+@app.route('/templateToAct/<any(query,position):page_name>/',methods=['get','post'])
+def templateToAct(page_name):
+    form=templateActForm()
+    if request.method=='GET' and page_name=='query':
+        return render_template('template/templateToAct.html', ts='false', form=form)
+    elif request.method == 'POST' and page_name == 'query':
+        act_ids = request.form.get('ad_ids')
+        env = request.form.get('env')
+        template_kws = request.form.get('template_kws')
+        tta = templateAct(env)
+        # if page_name == 'query':
+        #     if request.method == 'POST':
+        if template_kws:
+            template_kws = template_kws.encode('utf-8')
+        re = tta.get_infos(template_kws, act_ids)
+        if isinstance(re,list) and len(re)>0:
+            tta.exportTemplateXls(re)
+            return render_template('template/templateToAct.html', ts='true', form=form,re=re,env=env, flag='true')
+        else:
+            return render_template('template/templateToAct.html', ts='true', form=form,re=re,env=env, flag='flase')
+    elif page_name == 'position' and request.method == 'GET':
+        position_id = request.args.get('id')
+        env_tmp = request.args.get('env')
+        tta2 = templateAct(env_tmp)
+        position_re = tta2.get_position(position_id)
+        return render_template('template/position.html', re=position_re)
+        # else:
+        #     return render_template('template/templateToAct.html', ts='false', form=form)
 
 if __name__ == '__main__':
     app.run( host="0.0.0.0",port=21312,debug=True)
