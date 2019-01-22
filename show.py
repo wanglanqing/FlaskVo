@@ -2,13 +2,12 @@
 #encoding: utf-8
 #version:2018/07/10,增加接口统计视图函数
 import os
-
 import traceback
-
-import time
 
 from flask import jsonify
 from flask import Flask,request,render_template,flash
+from flask_paginate import Pagination,get_page_parameter
+
 from business_modle.report import hdtmonitor as m
 from business_modle.testtools import hdt_cssc as cssc
 from business_modle.report import reportdata as r
@@ -34,16 +33,20 @@ from business_modle.testtools.cpa_api import *
 from business_modle.querytool.crm_order import *
 from business_modle.querytool.adjust_ocpa import *
 from business_modle.querytool.ocpa_order import *
+from business_modle.querytool.punchcard import *
+from business_modle.querytool.mini_mediainfo import  *
 from business_modle.testtools.adinfo_collect import *
 from business_modle.testtools.del_minipragram import *
 from utils.Emar_SendMail_Attachments import *
 from config import mail_template,sqls
-from flask_paginate import Pagination,get_page_parameter
 from business_modle.Crm.CrmOrderEffectCheck import Crm
 from business_modle.querytool.phoneVaildCode import *
 from business_modle.checkRoute.checkRouteForm import *
 from business_modle.checkRoute.checkRoute import checkNodeRoute
-
+from business_modle.templateToAct.templateAct import templateAct
+from business_modle.templateToAct.templateActForm import templateActForm
+from business_modle.relate.adzoneActForm import adzoneActForm
+from business_modle.relate.relateAdzoneAds import relateAdzoneAct
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))   # refers to application_top
 APP_STATIC_TXT = os.path.join(APP_ROOT, 'txt') #设置一个专门的类似全局变量的东西
@@ -241,19 +244,34 @@ def myredis():
     else:
         jobid1=request.form.get('jobid')
         # mybudget=''
-        if jobid1=='120':
-            data='<option selected="selected">缓存中的订单预算：生产</option>'
-            redis_nodes=[{"host":'123.59.17.118',"port":'13601'},{"host":'123.59.17.85',"port":'13601'},{"host":'123.59.17.11',"port":'13601'}]
-            # mybudget,allcount,negativecount=mr.mygetredis(redis_nodes)
-            # return render_template('myredis.html',mybudget=mybudget,allcount=allcount,negativecount=negativecount)
-        elif jobid1=='110':
-            data='<option selected="selected">缓存中的订单预算：测试</option>'
-            # redis_nodes=[{"host":'172.16.105.11',"port":'17001'},{"host":'172.16.105.12',"port":'17001'},{"host":'172.16.105',"port":'17001'}]
-            redis_nodes=[{"host":'101.254.242.12',"port":'17001'},]
-        mybudget,allcount,negativecount=mr.mygetredis(redis_nodes)
-        return render_template('myredis.html',mybudget=mybudget,allcount=allcount,negativecount=negativecount,data=data)
+        # if jobid1=='120':
+        #     data='<option selected="selected">缓存中的订单预算：生产</option>'
+        #     redis_nodes=[{"host":'123.59.17.118',"port":'13601'},{"host":'123.59.17.85',"port":'13601'},{"host":'123.59.17.11',"port":'13601'}]
+        #     # mybudget,allcount,negativecount=mr.mygetredis(redis_nodes)
+        #     # return render_template('myredis.html',mybudget=mybudget,allcount=allcount,negativecount=negativecount)
+        # elif jobid1=='110':
+        #     data='<option selected="selected">缓存中的订单预算：测试</option>'
+        #     # redis_nodes=[{"host":'172.16.105.11',"port":'17001'},{"host":'172.16.105.12',"port":'17001'},{"host":'172.16.105',"port":'17001'}]
+        #     redis_nodes=[{"host":'101.254.242.12',"port":'17001'},]
+        mybudget,allcount,negativecount=mr.mygetredis(jobid1,'voyager:budget')
+        return render_template('myredis.html',mybudget=mybudget,allcount=allcount,negativecount=negativecount,jobid1=jobid1)
 
-
+@app.route('/budget_control/')
+def budget_control():
+    adorder=request.args.get('orderno')
+    key='voyager:budget_control:'+str(adorder)
+    jobid1=request.args.get('jobid1')
+    print key
+    tmp_total,tmp_rest=mr.mygetredis(jobid1,key)
+    # 当前小时
+    myhour=int(time.strftime("%H", time.localtime()))
+    return render_template('buggetcontrol.html',tmp_total=tmp_total,tmp_rest=tmp_rest,myhour=myhour)
+@app.route('/ocpa_orderadzone/',methods=('POST','GET'))
+def ocpa_orderadzone():
+    if request.method=='GET':
+        # 生产环境
+        tmpordeadzon=mr.mygetredis('1','voyager:ocpa_adzones')
+        return render_template('ocpaorderadzone.html',tmpordeadzon=tmpordeadzon)
 @app.route('/myredis_status/',methods=('POST','GET'))
 def myredis_status():
     if request.method=='GET':
@@ -853,6 +871,28 @@ def checkRoute():
         else:
             return render_template('checkRoute.html',form = form,re=re,re_type=0)
 
+
+@app.route('/punchcard',methods=['POST','GET'])
+def punchcard():
+    title = u"小程序用户信息"
+    if request.method == 'GET':
+        return render_template('punchcard.html',title=title)
+
+    else:
+        begin_date = request.form.get('begin_date')
+        end_date = request.form.get('end_date')
+        punchcard_result = Punchcard(begin_date,end_date,env_value=False)
+        # paras = punchcard_result.user_info()
+        total_amount = punchcard_result.total_amount()
+        total_addamount=punchcard_result.today_addamount()
+        invite_add=punchcard_result.invite_add()
+        non_inviteadd=punchcard_result.non_inviteadd()
+        today_sign=punchcard_result.today_sign()
+        xvalue=punchcard_result.dateRange(begin_date,end_date)
+        data=punchcard_result.add_user(begin_date,end_date)
+        return render_template('punchcard.html',total_amount=total_amount,today_addamount=total_addamount,today_sign=today_sign,begin_date=begin_date,end_date=end_date,xvalue=xvalue,data=data,invite_add=invite_add,non_inviteadd=non_inviteadd)
+
+
 @app.route('/templateToAct/<any(query,position):page_name>/',methods=['get','post'])
 def templateToAct(page_name):
     form=templateActForm()
@@ -881,6 +921,41 @@ def templateToAct(page_name):
         return render_template('template/position.html', re=position_re)
         # else:
         #     return render_template('template/templateToAct.html', ts='false', form=form)
+
+@app.route('/mini_mediainfo',methods=['POST','GET'])
+def mini_mediainfo():
+
+    title=u'小程序推广渠道数据统计'
+    if request.method=='GET':
+        return render_template('mini_mediainfo.html',title=title)
+
+    else:
+        begin_time=request.form.get('begin_time')
+        media_dict={u"有练换换":"wx0a051787252f83fa",u"步数大联盟":"wxe65c34b4ec242be",u"优质福利所":"wx3c48ef7a45e89118"}
+        media_info=request.form.get('media_name').strip()
+        mediainfo=Mini_mediainfo(media_dict[media_info],begin_time,env_value=False)
+        authorize_user=mediainfo.authorize_user()
+        wxstep_user=mediainfo.wxstep_user()
+        invite_user=mediainfo.invite_user()
+        invited_user=mediainfo.invited_user()
+        task_user=mediainfo.task_user()
+        return render_template('mini_mediainfo.html',begin_time=begin_time,media_name='<option selected="selected">'+media_info+'</option>',authorize_user=authorize_user,wxstep_user=wxstep_user,invite_user=invite_user,invited_user=invited_user,task_user=task_user)
+
+@app.route('/adzoneAct/',methods=['GET','POST'])
+def adzoneAct():
+    form = adzoneActForm()
+    if request.method == 'GET':
+        return render_template('adzoneAct.html',form=form,pos=0)
+    else:
+        adzoneId = request.form.get('adzoneId').strip()
+        acts = request.form.get('acts').strip()
+        RAA = relateAdzoneAct(adzoneId,acts)
+        RAA.updateAdzoneAct()
+        link = RAA.get_link()
+        adzone =  RAA.get_adzone_url()
+        return render_template('adzoneAct.html', form=form, pos=1, link=link, adzone=adzone)
+
+
 
 if __name__ == '__main__':
     app.run( host="0.0.0.0",port=21312,debug=True)
