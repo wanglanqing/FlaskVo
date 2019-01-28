@@ -9,7 +9,7 @@
 </head>
 <div class="container">
     <body>
-        <form action="{{ url_for ('adzoneAct') }}" method="POST">
+        <form action="{{ url_for ('act.adzoneAct') }}" method="POST">
             {{ render_field(form.adzoneId,pattern="[0-9]{3,7}") }}
 {#            {{ render_field(form.version,required="required") }}#}
             {{ render_field(form.acts) }}

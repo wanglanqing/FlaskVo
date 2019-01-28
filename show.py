@@ -6,7 +6,7 @@ import traceback
 
 from flask import jsonify
 from flask import Flask,request,render_template,flash
-from flask_paginate import Pagination,get_page_parameter
+# from flask_paginate import Pagination,get_page_parameter
 
 from business_modle.report import hdtmonitor as m
 from business_modle.testtools import hdt_cssc as cssc
@@ -34,7 +34,8 @@ from business_modle.querytool.crm_order import *
 from business_modle.querytool.adjust_ocpa import *
 from business_modle.querytool.ocpa_order import *
 from business_modle.querytool.punchcard import *
-from business_modle.querytool.mini_mediainfo import  *
+from business_modle.querytool.mini_mediainfo import *
+from business_modle.querytool.mini_userinfo import *
 from business_modle.testtools.adinfo_collect import *
 from business_modle.testtools.del_minipragram import *
 from utils.Emar_SendMail_Attachments import *
@@ -45,12 +46,13 @@ from business_modle.checkRoute.checkRouteForm import *
 from business_modle.checkRoute.checkRoute import checkNodeRoute
 from business_modle.templateToAct.templateAct import templateAct
 from business_modle.templateToAct.templateActForm import templateActForm
-from business_modle.relate.adzoneActForm import adzoneActForm
-from business_modle.relate.relateAdzoneAds import relateAdzoneAct
+from bp.hdt_act.hdt_act import act
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))   # refers to application_top
 APP_STATIC_TXT = os.path.join(APP_ROOT, 'txt') #设置一个专门的类似全局变量的东西
 app = Flask(__name__)
+#将活动蓝图注册到app
+app.register_blueprint(act,url_prefix='/act')
 # app.jinja_env.add_extension("chartkick.ext.charts")
 # app.config.from_object('config')
 # app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
@@ -259,19 +261,28 @@ def myredis():
 @app.route('/budget_control/')
 def budget_control():
     adorder=request.args.get('orderno')
+    # page=request.args.get('page')
     key='voyager:budget_control:'+str(adorder)
     jobid1=request.args.get('jobid1')
     print key
-    tmp_total,tmp_rest=mr.mygetredis(jobid1,key)
+    tmp_all=mr.mygetredis(jobid1,key)
     # 当前小时
     myhour=int(time.strftime("%H", time.localtime()))
-    return render_template('buggetcontrol.html',tmp_total=tmp_total,tmp_rest=tmp_rest,myhour=myhour)
+    return render_template('buggetcontrol.html',tmp_all=tmp_all,myhour=myhour)
 @app.route('/ocpa_orderadzone/',methods=('POST','GET'))
 def ocpa_orderadzone():
     if request.method=='GET':
         # 生产环境
         tmpordeadzon=mr.mygetredis('1','voyager:ocpa_adzones')
         return render_template('ocpaorderadzone.html',tmpordeadzon=tmpordeadzon)
+
+@app.route('/ocpa_ordercost/',methods=('POST','GET'))
+def ocpa_ordercost():
+    if request.method=='GET':
+        tmpordercost=mr.mygetredis('1','voyager:ocpa_actual_cost')
+        return render_template('ocpaordercost.html',tmpordercost=tmpordercost)
+
+
 @app.route('/myredis_status/',methods=('POST','GET'))
 def myredis_status():
     if request.method=='GET':
@@ -796,8 +807,9 @@ def ocpa_order():
         beign_time_re=begin_time.replace('-','')
         result_order= Ocpa_order(beign_time_re,env_value=False)
         paras=result_order.show_result()
-
-        return render_template("ocpa_order.html",title=title,paras=paras,begin_time=beign_time_re,begintime=begin_time)
+        ocpa_consume=result_order.ocpa_consumer()
+        ocpa_percent=result_order.ocpa_percent()
+        return render_template("ocpa_order.html",title=title,paras=paras,ocpa_consume=ocpa_consume,ocpa_percent=ocpa_percent,begin_time=beign_time_re,begintime=begin_time)
 
 
 @app.route('/ocpaorder_detail')
@@ -903,8 +915,6 @@ def templateToAct(page_name):
         env = request.form.get('env')
         template_kws = request.form.get('template_kws')
         tta = templateAct(env)
-        # if page_name == 'query':
-        #     if request.method == 'POST':
         if template_kws:
             template_kws = template_kws.encode('utf-8')
         re = tta.get_infos(template_kws, act_ids)
@@ -919,8 +929,6 @@ def templateToAct(page_name):
         tta2 = templateAct(env_tmp)
         position_re = tta2.get_position(position_id)
         return render_template('template/position.html', re=position_re)
-        # else:
-        #     return render_template('template/templateToAct.html', ts='false', form=form)
 
 @app.route('/mini_mediainfo',methods=['POST','GET'])
 def mini_mediainfo():
@@ -941,19 +949,19 @@ def mini_mediainfo():
         task_user=mediainfo.task_user()
         return render_template('mini_mediainfo.html',begin_time=begin_time,media_name='<option selected="selected">'+media_info+'</option>',authorize_user=authorize_user,wxstep_user=wxstep_user,invite_user=invite_user,invited_user=invited_user,task_user=task_user)
 
-@app.route('/adzoneAct/',methods=['GET','POST'])
-def adzoneAct():
-    form = adzoneActForm()
+@app.route('/mini_userinfo',methods=['POST','GET'])
+
+def mini_userinfo():
+    title = u'小程序用户信息查询'
+
     if request.method == 'GET':
-        return render_template('adzoneAct.html',form=form,pos=0)
+        return render_template('mini_userinfo.html',title=title)
+
     else:
-        adzoneId = request.form.get('adzoneId').strip()
-        acts = request.form.get('acts').strip()
-        RAA = relateAdzoneAct(adzoneId,acts)
-        RAA.updateAdzoneAct()
-        link = RAA.get_link()
-        adzone =  RAA.get_adzone_url()
-        return render_template('adzoneAct.html', form=form, pos=1, link=link, adzone=adzone)
+        nickname=request.form.get('nick_name')
+        mini_info= Mini_userinfo(nickname,env_value=False)
+        paras=mini_info.userinfo()
+        return render_template('mini_userinfo.html',nick_name=nickname,paras=paras)
 
 
 
