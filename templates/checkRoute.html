@@ -1,6 +1,19 @@
 {% extends "base.html"%}
 {% from "_field.html" import render_field %}
 {% block main %}
+        <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+        <script>
+  $(document).ready(function() {
+    $('input[type=radio][name=env]').change(function() {
+       if (this.value == '1') {
+            $('input#adzoneLink').val('https://display.adhudong.com/site_login_ijf.htm?app_key=adhuc5f5526ee4664923')
+        }
+        else if (this.value == '0') {
+            $('input#adzoneLink').val('https://display.eqigou.com/site_login_ijf.htm?app_key=adhu307b689d63514835')
+        }
+    });
+});
+</script>
     <style>
     li{
         float: left;
@@ -15,7 +28,7 @@
     }
     </style>
 <div class="container">
-<form action="{{url_for('checkRoute')}}" method="post">
+<form action="{{url_for('act.checkRoute')}}" method="post">
     {{ render_field(form.env) }}
     {{ render_field(form.adzoneLink) }}
     <br>
