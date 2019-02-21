@@ -4,23 +4,22 @@
     <title>{{ title }}</title>
 </head>
     {% block main %}
-    <p>接口用例列表</p>
+    <b><p>接口用例列表</p></b>
 
         <script>
         $(document).ready(function() {
     $('#example').DataTable();
 } );</script>
-    <table id="example" class="display" style="width:100%" border="1" >
-    <p>{{ sub_system }}</p>
+    <table id="example" class="display" style="table-layout:fixed;overflow:hidden;word-break: break-all " border="1" >
         <thead style="background-color: darkseagreen">
             <tr>
-             <th width="5%">id</th>
+             <th width="3%">id</th>
              <th width="10%">apiname</th>
-             <th width="10%">操作</th>
+             <th width="3%">操作</th>
              <th width="10%">param_type</th>
              <th style="width: 15%">testcasename</th>
-             <th width="15%">methodurl</th>
-             <th width="25%">param</th>
+             <th width="17%">methodurl</th>
+             <th width="32%">param</th>
              <th width="10%">expect_value</th>
             </tr>
         </thead>
