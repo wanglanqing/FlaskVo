@@ -2,17 +2,15 @@
 #encoding: utf-8
 #version:2018/07/10,增加接口统计视图函数
 import os
+
 from flask import jsonify
-from flask import Flask,request,render_template,flash,url_for
-from flask_paginate import Pagination,get_page_parameter
+from flask import Flask,request,render_template,flash
 from business_modle.report import hdtmonitor as m
 from business_modle.testtools import hdt_cssc as cssc
 from business_modle.report import reportdata as r
 from business_modle.report import tuodi_day_order as myorder
 from business_modle.launch import launchlistdb as lc
 from business_modle.querytool import bidding_analysis as ba
-from business_modle.querytool import myredis as mr
-from business_modle.querytool import myredis_status as mrs
 from business_modle.querytool.confparas import *
 from business_modle.querytool.get_act import *
 from business_modle.querytool.updateAdId import *
@@ -21,16 +19,10 @@ from business_modle.report import tuodi_oneviw as tuodi_oneviw
 from business_modle.testtools import houtai as ht
 from business_modle.querytool import plantfromwtf as ft
 from business_modle.querytool.plantfromwtf import *
-from business_modle.apitool.apiTool import *
 from business_modle.VersionTracker.VersionTracker import VersionTracker
 from business_modle.testtools.Recharge import *
 from business_modle.testtools.cpa_api import *
 from business_modle.querytool.crm_order import *
-from business_modle.querytool.adjust_ocpa import *
-from business_modle.querytool.ocpa_order import *
-from business_modle.querytool.punchcard import *
-from business_modle.querytool.mini_mediainfo import *
-from business_modle.querytool.mini_userinfo import *
 from business_modle.testtools.adinfo_collect import *
 from business_modle.testtools.del_minipragram import *
 from utils.Emar_SendMail_Attachments import *
@@ -38,12 +30,19 @@ from config import mail_template,sqls
 from business_modle.Crm.CrmOrderEffectCheck import Crm
 from business_modle.querytool.phoneVaildCode import *
 from bp.hdt_act.hdt_act import act
-
+from bp.hdt_redis.hdt_redis import  hdtredis
+from bp.miniprogram.miniprogram import miniprogram
+from bp.ocpa.ocpa import ocpa
+from bp.test_case.test_case import testCase
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))   # refers to application_top
 APP_STATIC_TXT = os.path.join(APP_ROOT, 'txt') #设置一个专门的类似全局变量的东西
 app = Flask(__name__)
 #将活动蓝图注册到app
 app.register_blueprint(act,url_prefix='/act')
+app.register_blueprint(hdtredis,url_prefix='/hdtredis')
+app.register_blueprint(ocpa,url_prefix='/ocpa')
+app.register_blueprint(miniprogram,url_prefix='/miniprogram')
+app.register_blueprint(testCase,url_prefix='/tc')
 # app.jinja_env.add_extension("chartkick.ext.charts")
 # app.config.from_object('config')
 # app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
@@ -230,67 +229,6 @@ def hdtapi():
                 print e.message
                 data=e.message
         return render_template('allapi.html',data=data)
-@app.route('/myredis/',methods=('POST','GET'))
-def myredis():
-    if request.method=='GET':
-        return render_template('myredis.html')
-    else:
-        jobid1=request.form.get('jobid')
-        # mybudget=''
-        # if jobid1=='120':
-        #     data='<option selected="selected">缓存中的订单预算：生产</option>'
-        #     redis_nodes=[{"host":'123.59.17.118',"port":'13601'},{"host":'123.59.17.85',"port":'13601'},{"host":'123.59.17.11',"port":'13601'}]
-        #     # mybudget,allcount,negativecount=mr.mygetredis(redis_nodes)
-        #     # return render_template('myredis.html',mybudget=mybudget,allcount=allcount,negativecount=negativecount)
-        # elif jobid1=='110':
-        #     data='<option selected="selected">缓存中的订单预算：测试</option>'
-        #     # redis_nodes=[{"host":'172.16.105.11',"port":'17001'},{"host":'172.16.105.12',"port":'17001'},{"host":'172.16.105',"port":'17001'}]
-        #     redis_nodes=[{"host":'101.254.242.12',"port":'17001'},]
-        mybudget,allcount,negativecount=mr.mygetredis(jobid1,'voyager:budget')
-        return render_template('myredis.html',mybudget=mybudget,allcount=allcount,negativecount=negativecount,jobid1=jobid1)
-
-@app.route('/budget_control/')
-def budget_control():
-    adorder=request.args.get('orderno')
-    # page=request.args.get('page')
-    key='voyager:budget_control:'+str(adorder)
-    jobid1=request.args.get('jobid1')
-    print key
-    tmp_all=mr.mygetredis(jobid1,key)
-    # 当前小时
-    myhour=int(time.strftime("%H", time.localtime()))
-    return render_template('buggetcontrol.html',tmp_all=tmp_all,myhour=myhour)
-@app.route('/ocpa_orderadzone/',methods=('POST','GET'))
-def ocpa_orderadzone():
-    if request.method=='GET':
-        # 生产环境
-        tmpordeadzon=mr.mygetredis('1','voyager:ocpa_adzones')
-        return render_template('ocpaorderadzone.html',tmpordeadzon=tmpordeadzon)
-
-@app.route('/ocpa_ordercost/',methods=('POST','GET'))
-def ocpa_ordercost():
-    if request.method=='GET':
-        tmpordercost=mr.mygetredis('1','voyager:ocpa_actual_cost')
-        return render_template('ocpaordercost.html',tmpordercost=tmpordercost)
-
-
-@app.route('/myredis_status/',methods=('POST','GET'))
-def myredis_status():
-    if request.method=='GET':
-        return render_template('myredis_status.html')
-    else:
-        jobid1=request.form.get('jobid')
-        # mybudget=''
-        if jobid1=='120':
-            data='<option selected="selected">缓存中的订单状态：生产</option>'
-            redis_nodes=[{"host":'123.59.17.118',"port":'13601'},{"host":'123.59.17.85',"port":'13601'},{"host":'123.59.17.11',"port":'13601'}]
-            # mybudget,allcount,negativecount=mr.mygetredis(redis_nodes)
-            # return render_template('myredis.html',mybudget=mybudget,allcount=allcount,negativecount=negativecount)
-        elif jobid1=='110':
-            data='<option selected="selected">缓存中的订单状态：测试</option>'
-            redis_nodes=[{"host":'101.254.242.11',"port":'17001'},{"host":'101.254.242.12',"port":'17001'},{"host":'101.254.242.17',"port":'17001'}]
-        order_status,allcount,negativecount=mrs.mygetredis(redis_nodes)
-        return render_template('myredis_status.html',order_status=order_status,allcount=allcount,negativecount=negativecount,data=data)
 
 @app.route('/voyagerlog/',methods=('POST','GET'))
 def voyagerlog():
@@ -423,9 +361,6 @@ def UpdateAdId():
         ua.udpate()
         up_advertiser=ua.select()
         return  render_template("UpdateAdId.html",up_advertiser=up_advertiser,title=title)
-
-
-
 @app.route('/queryAppkey',methods=['POST','GET'])
 def QueryAppkey():
     title = u'查询广告位Appkey'
@@ -452,91 +387,6 @@ def login():
         else:
             return 'Wrong user!'
     return render_template('logintest.html', form=form)
-
-#新建，修改测试用例
-@app.route('/Api_index/TestCase/<sub_system>/<any(new,update):page_name>/', methods=('POST','GET'))
-def TestCase(sub_system,page_name):
-    form = TestCaseForm()
-    at = Api()
-    if page_name=='new' and form.is_submitted():
-        sql_data = form.data
-        sql_data.pop('csrf_token')
-        sql_data.pop('submit')
-        url_params = at.split_url(sql_data['methodurl'])
-        # print url_params[1]
-        sql_data['methodurl'] = url_params[0].strip()
-        sql_data['param'] = str(url_params[1]).strip()
-        sql_data['group'] = sub_system
-        print sql_data
-        keys = tuple(sql_data.keys())
-        values_list = json.dumps(sql_data.values(), encoding='utf-8', ensure_ascii=False)
-        re = at.insert_case(values_list, keys)
-        if re != 0:
-            flash('添加成功')
-        else:
-            flash('添加失败')
-        return render_template('TestCase/testCase.html', form=form, case_detail=None, sub_system=sub_system)
-    elif page_name=='update':
-        if len(request.args) > 0:
-            cid = request.args['id']
-            case_detail = at.query_case_detail(cid)[0]
-            methodurl = at.merge_url_param(str(case_detail['methodurl']), str(case_detail['param']))
-            if form.is_submitted():
-                sql_data = form.data
-                sql_data.pop('csrf_token')
-                sql_data.pop('submit')
-                url_params = at.split_url(sql_data['methodurl'])
-                sql_data['methodurl'] = url_params[0].strip()
-                sql_data['param'] = url_params[1]
-                sql_data['group'] = sub_system.strip()
-                set_value='''apiState= "{}",apiName= "{}",testCaseName= "{}",`status`= "{}",`level` = "{}",param_type = "{}",
-                             methodurl = "{}",param="{}", actresult = "{}", expect_value = "{}", remarks = "{}"
-                             '''.format(sql_data['apiState'],sql_data['apiName'],sql_data['testCaseName'],sql_data['status'],
-                                        sql_data['level'],sql_data['param_type'],sql_data['methodurl'],sql_data['param'],
-                                        sql_data['actresult'],sql_data['expect_value'],sql_data['remarks'])
-                print set_value
-                at.update_case(set_value,cid)
-                case_detail = at.query_case_detail(cid)[0]
-                return render_template('TestCase/testCase.html', form=form, case_detail=case_detail,methodurl=methodurl, sub_system=sub_system)
-            else:
-                return render_template('TestCase/testCase.html', form=form, case_detail=case_detail, methodurl=methodurl,sub_system=sub_system)
-        return render_template('TestCase/testCase.html', form=form, case_detail=None, sub_system=sub_system)
-    return render_template('TestCase/testCase.html', form = form,case_detail=None,sub_system=sub_system)
-
-@app.route('/Api_index/<sub_system>/<any(stat,detail):page_name>/', methods=['POST','GET'])
-def sub_system(sub_system,page_name): #,id=None):
-    title = sub_system
-    at = Api()
-    if page_name=='stat':
-        static_data = at.query_api_stat_detail(sub_system)
-        return render_template('TestCase/sub_system_static.html',title = title, static_data = static_data, static_count = len(static_data),sub_system=sub_system )
-    elif page_name=='detail':
-        search = False
-        pagesize=20
-        q = request.args.get('q')
-        if q:
-            search=True
-        page = request.args.get(get_page_parameter(),type=int,default=1)
-        print request.method
-        if request.method=='POST':
-            cid = request.form.get('id').strip()
-            detail_data = at.query_case_list(sub_system, page, pagesize,id=cid)
-            print detail_data
-            print cid,'is is is is'
-        else:
-            detail_data = at.query_case_list(sub_system, page, pagesize)
-        if isinstance(detail_data[0],list):
-            total =detail_data[1]
-            pagination=Pagination(page=page,total=total,per_page=pagesize,search=search,record_name='cases')
-            return render_template('TestCase/FinalCaseList.html', title=title, detail_data=detail_data[0],pagesize=pagesize, detail_count=detail_data[1],pagination=pagination,system_name=sub_system)
-        elif isinstance(detail_data,str):
-            return render_template('TestCase/FinalCaseList.html', title=title, detail_data=detail_data,sub_system=sub_system)
-
-@app.route('/Api_index/')
-def Api_index():
-    at = Api()
-    re = at.query_api_stat_summary()
-    return render_template('TestCase/apiStatic.html',re =re, col_len = len(re[0]))
 
 @app.route('/test/')
 def test():
@@ -694,56 +544,6 @@ def query_result():
 
         return render_template("advertiser_test.html",title=title,url=ad_link,new_url=new_url,paras=paras,ad_click_tag=utm_click)
 
-@app.route('/ocpa_price',methods=['POST','GET'])
-def ocpa_price():
-    title=u'广告主OCPA调价趋势图'
-    if request.method == 'GET':
-
-        return render_template('adjust_ocpa.html',title=title)
-
-    else:
-        env_dict={u'测试环境':True,u'线上环境':False}
-        env=request.form.get('env').strip()
-        ad_order_id = request.form.get('ad_order_id')
-        adzone_id = request.form.get('AdzoneId')
-
-        day=request.form.get('begin_date')
-        beign_time_re=day.replace('-','')
-        oc=adjust_price(day,ad_order_id,env_dict[env],adzone_id=adzone_id)
-        xvalue,dat,dat2,init_price,dat3,dat4=oc.timelist(),oc.adjust_ocpa(),oc.actual_payment(),oc.init_price(),oc.adzone(),oc.shownum()
-        print xvalue,dat,init_price
-        print adzone_id
-        return render_template('adjust_ocpa.html',xvalue=xvalue,title=title,data=dat,data2=dat2,data3=dat3,data4=dat4,init_price=init_price,begintime=day,ad_order_id=ad_order_id,adzone_id=int(adzone_id),env_value='<option selected="selected">'+env+'</option>')
-
-
-@app.route('/ocpa_order',methods=['POST','GET'])
-def ocpa_order():
-    title=u'OCPA订单查询'
-    if request.method == 'GET':
-
-        return render_template('ocpa_order.html',title=title)
-    else:
-        begin_time = request.form.get('begin_date')
-        beign_time_re=begin_time.replace('-','')
-        result_order= Ocpa_order(beign_time_re,env_value=False)
-        paras=result_order.show_result()
-        ocpa_consume=result_order.ocpa_consumer()
-        ocpa_percent=result_order.ocpa_percent()
-        return render_template("ocpa_order.html",title=title,paras=paras,ocpa_consume=ocpa_consume,ocpa_percent=ocpa_percent,begin_time=beign_time_re,begintime=begin_time)
-
-
-@app.route('/ocpaorder_detail')
-
-def ocpaorder_detail(env=False):
-    title=u'OCPA订单调价趋势图'
-    ad_order_id=request.args.get('ad_order_id')
-    day=request.args.get('date')
-    adzone_id=request.args.get('adzone_id')
-    oc=adjust_price(day,ad_order_id,env,adzone_id=adzone_id)
-
-    xvalue,dat,dat2,init_price,dat3=oc.timelist(),oc.adjust_ocpa(),oc.actual_payment(),oc.init_price(),oc.adzone()
-#    adzone_id=request.form.get('AdzoneId')
-    return render_template('adjust_ocpa.html',xvalue=xvalue,title=title,data=dat,data2=dat2,data3=dat3,init_price=init_price,begintime=day,ad_order_id=ad_order_id,adzone_id=int(adzone_id),env_value=False)
 
 @app.route('/crm/effect_order/',methods=['GET','POST'])
 def effect_order():
@@ -784,59 +584,6 @@ def phoneVaildCode():
         pp = phoneVaild(env=env[0])
         re = pp.get_valid_code()
         return  render_template('phoneVaildCode.html',re=re,pos=env[0])
-
-@app.route('/punchcard',methods=['POST','GET'])
-def punchcard():
-    title = u"小程序用户信息"
-    if request.method == 'GET':
-        return render_template('punchcard.html',title=title)
-
-    else:
-        begin_date = request.form.get('begin_date')
-        end_date = request.form.get('end_date')
-        punchcard_result = Punchcard(begin_date,end_date,env_value=False)
-        # paras = punchcard_result.user_info()
-        total_amount = punchcard_result.total_amount()
-        total_addamount=punchcard_result.today_addamount()
-        invite_add=punchcard_result.invite_add()
-        non_inviteadd=punchcard_result.non_inviteadd()
-        today_sign=punchcard_result.today_sign()
-        xvalue=punchcard_result.dateRange(begin_date,end_date)
-        data=punchcard_result.add_user(begin_date,end_date)
-        return render_template('punchcard.html',total_amount=total_amount,today_addamount=total_addamount,today_sign=today_sign,begin_date=begin_date,end_date=end_date,xvalue=xvalue,data=data,invite_add=invite_add,non_inviteadd=non_inviteadd)
-
-@app.route('/mini_mediainfo',methods=['POST','GET'])
-def mini_mediainfo():
-
-    title=u'小程序推广渠道数据统计'
-    if request.method=='GET':
-        return render_template('mini_mediainfo.html',title=title)
-
-    else:
-        begin_time=request.form.get('begin_time')
-        media_dict={u"有练换换":"wx0a051787252f83fa",u"步数大联盟":"wxe65c34b4ec242be",u"优质福利所":"wx3c48ef7a45e89118"}
-        media_info=request.form.get('media_name').strip()
-        mediainfo=Mini_mediainfo(media_dict[media_info],begin_time,env_value=False)
-        authorize_user=mediainfo.authorize_user()
-        wxstep_user=mediainfo.wxstep_user()
-        invite_user=mediainfo.invite_user()
-        invited_user=mediainfo.invited_user()
-        task_user=mediainfo.task_user()
-        return render_template('mini_mediainfo.html',begin_time=begin_time,media_name='<option selected="selected">'+media_info+'</option>',authorize_user=authorize_user,wxstep_user=wxstep_user,invite_user=invite_user,invited_user=invited_user,task_user=task_user)
-
-@app.route('/mini_userinfo',methods=['POST','GET'])
-
-def mini_userinfo():
-    title = u'小程序用户信息查询'
-
-    if request.method == 'GET':
-        return render_template('mini_userinfo.html',title=title)
-
-    else:
-        nickname=request.form.get('nick_name')
-        mini_info= Mini_userinfo(nickname,env_value=False)
-        paras=mini_info.userinfo()
-        return render_template('mini_userinfo.html',nick_name=nickname,paras=paras)
 
 if __name__ == '__main__':
     app.run( host="0.0.0.0",port=21312,debug=True)

@@ -61,21 +61,18 @@
           <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">查询工具<span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="{{url_for('myredis')}}">redis缓存数据-订单预算(互动推)</a></li>
-            <li><a href="{{url_for('myredis_status')}}">redis缓存数据-订单状态(互动推)</a></li>
+            <li><a href="{{url_for('hdt_redis.myredis')}}">redis缓存数据-订单预算(互动推)</a></li>
+            <li><a href="{{url_for('hdt_redis.myredis_status')}}">redis缓存数据-订单状态(互动推)</a></li>
             <li><a href="{{url_for('voyagerlog1')}}">查询生产环境日志(互动推)</a></li>
             <li><a href="{{url_for('confparas')}}">数据库配置(互动推)</a></li>
             <li><a href="{{url_for('ad_simulation')}}">模拟投放接口(互动推)</a></li>
             <li><a href="{{url_for('UpdateAdId')}}">更新Advertiser_ID</a></li>
             <li><a href="{{url_for('QueryAppkey')}}">查询Appkey</a></li>
             <li><a href="{{url_for('crm_order')}}">优品购订单明细查询</a></li>
-            <li><a href="{{url_for('ocpa_price')}}">OCPA订单调价趋势图</a></li>
-            <li><a href="{{url_for('ocpa_order')}}">OCPA订单明细查询</a></li>
+
             <li><a href="{{url_for('effect_order')}}">优品购效果和订单一致性查询</a></li>
             <li><a href="{{url_for('phoneVaildCode')}}">测试环境手机验证码查询</a></li>
-            <li><a href="{{url_for('punchcard')}}">低碳打卡小程序用户信息统计</a></li>
-            <li><a href="{{url_for('mini_mediainfo')}}">小程序推广渠道数据统计</a></li>
-            <li><a href="{{url_for('mini_userinfo')}}">小程序用户数据查询</a></li>
+
             <li role="separator" class="divider"></li>
           </ul>
         </li>
@@ -89,10 +86,29 @@
             <li role="separator" class="divider"></li>
           </ul>
         </li>
+          <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">OCPA相关功能<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                  <li><a href="{{url_for('ocpa.ocpa_price')}}">OCPA订单调价趋势图</a></li>
+                  <li><a href="{{url_for('ocpa.ocpa_order')}}">OCPA订单明细查询</a></li>
+                  <li role="separator" class="divider"></li>
+              </ul>
+          </li>
+          <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">小程序相关功能<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                  <li><a href="{{url_for('miniprogram.punchcard')}}">低碳打卡小程序用户信息统计</a></li>
+                  <li><a href="{{url_for('miniprogram.mini_mediainfo')}}">小程序推广渠道数据统计</a></li>
+                  <li><a href="{{url_for('miniprogram.mini_userinfo')}}">小程序用户数据查询</a></li>
+                  <li><a href="{{url_for('miniprogram.media_report')}}">小程序媒体报表</a></li>
+                  <li><a href="{{url_for('miniprogram.media_reportnew')}}">小程序媒体报表最新版</a></li>
+                  <li role="separator" class="divider"></li>
+              </ul>
+          </li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">API套件<span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="{{url_for('Api_index')}}">API统计</a></li>
+            <li><a href="{{url_for('testCase.Api_index')}}">API统计</a></li>
             <li role="separator" class="divider"></li>
           </ul>
         </li>
