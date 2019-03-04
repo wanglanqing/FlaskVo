@@ -10,6 +10,7 @@ import datetime
 
 class MyForm(Form):
     adzoneClickid = StringField('adzoneClickid', validators=[Length(min=4, max=25)])
+    myenv=RadioField('myenv',choices=[('dev',u'生产环境'),('test',u'测试环境')],default='dev')
 
 # class Mylaunchlist(Form):
 #     def mymonth(self):
@@ -33,11 +34,12 @@ class TestCaseForm(Form):
     testCaseName = StringField(u'testCaseName',validators=[DataRequired()],render_kw={'placholder':'order/list'})
     # status = SelectField(u'status',choices=[('有效','1'),('无效','0')])
     # group=RadioField('group',validators=[],choices=[('yiiqfa','yiiqfa'),('egou','egou'),('hudongtui','hudongtui')])
-    group=RadioField('group',validators=[DataRequired()],choices=ssl)
+    # group=RadioField('group',validators=[DataRequired()],choices=ssl)
     status = RadioField(label=u'status',validators=[DataRequired()],choices=[('1', u'启用'),('0', u'停用')],default='1')
     level = IntegerField(u'level',validators=[],render_kw={'placeholder':u'等级1 2 3'})
     param_type = SelectField(u'param_type', choices=[('A',u'错误信息'), ('B', u'数据结构'), ('C', u'状态码')])
-    methodurl = TextAreaField(u'methodurl', validators=[DataRequired()],render_kw={'placeholder':'http://api.demand.adhudong.com/api/voyager/order/list.htm','style':'height:50px','style':'weight:200px'})
+    # methodurl = TextAreaField(u'methodurl', validators=[DataRequired()],render_kw={'placeholder':'http://api.demand.adhudong.com/api/voyager/order/list.htm','style':'height:50px','style':'weight:200px'})
+    methodurl = TextAreaField(u'methodurl', validators=[DataRequired()],render_kw={'style': 'height:50px', 'style': 'weight:200px'})
     # param = TextAreaField(u'param',render_kw={'placeholder':"{'aid':'0'}",'style':'height:100px；weight:50px'})
     actresult = IntegerField(u'actresult',render_kw={'placeholder':u'http状态码 e.g 200 302'})
     expect_value=TextAreaField('expect_value')
@@ -83,7 +85,7 @@ class Mylaunchlist(Form):
     #增加获取当前年和月
     current_year= int(datetime.datetime.now().year)
     current_month=int(datetime.datetime.now().month)
-    myyear = SelectField(u'年', validators=[DataRequired()], choices=[(2018, 2018), (2019, 2019), (2010, 2010), ],
+    myyear = SelectField(u'年', validators=[DataRequired()], choices=[(2018, 2018), (2019, 2019), (2020, 2020),(2021, 2021), ],
                          default=current_year)
     mymonth = SelectField(u'月', validators=[DataRequired()],
                           choices=[(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8), (9, 9), (10, 10),
