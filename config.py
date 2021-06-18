@@ -2,13 +2,13 @@
 #coding=utf-8
 CSRF_ENABLED = True
 # CSRF_ENABLED = False
-SECRET_KEY = 'fdasfdasfds&YUJFGGHNMJKLOL:'
+SECRET_KEY = 'xxx'
 
 #定义数据库信息
 db_config = {
-    'voyager_test': ("221.122.127.183",5701,"voyager","voyager","voyager","utf8"),
-    'voyager_online': ("123.59.17.121",3306,"voyager","voyager","SIkxiJI5r48JIvPh",'utf8'),
-    'doc_online': ("123.59.17.245",3306,"doc","doc_reader","fedh0gkM0Wx9",'utf8'),
+    'voyager_test': ("x.x.x.x",5701,"voyager","name","xx","utf8"),
+    'voyager_online': ("x.x.x.x",3306,"voyager","name","xx",'utf8'),
+    'doc_online': ("x.x.x.x",3306,"doc","deader","xx",'utf8'),
 }
 
 # ['hdt_demand','hdt_admin','hdt_displaynode','egou','yiqigou']
